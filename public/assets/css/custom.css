@@ -1,0 +1,5 @@
+/* Wadnou tweaks */
+.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .logo-wrapper,
+.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .logo-icon-wrapper {
+  padding-top: 12px;
+}
