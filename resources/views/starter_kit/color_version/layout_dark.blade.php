@@ -33,11 +33,11 @@
                     <h5>Page de demarrage</h5>
                 </div>
                 <div class="card-body">
-                    <p>Exemple de mise en page sombre pour le template Cuba. Adaptez la structure et le branding pour Wadnou.</p>
+                    <p>Exemple de mise en page sombre pour le template Cuba. Adaptez la structure et le branding pour Videzma.</p>
                     <ul>
                         <li>Gardez les composants utiles et retirez le reste.</li>
                         <li>Utilisez les variables SCSS pour ajuster les couleurs.</li>
-                        <li>Remplacez les logos et les textes par le contenu Wadnou.</li>
+                        <li>Remplacez les logos et les textes par le contenu Videzma.</li>
                     </ul>
                 </div>
             </div>

@@ -15,7 +15,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12 footer-copyright text-center">
-                <p class="mb-0">Droits <span class="year-update"> </span> Administration Wadnou</p>
+                <p class="mb-0">© <span class="year-update"> </span> Videzma - Service de vidange a domicile</p>
             </div>
         </div>
     </div>

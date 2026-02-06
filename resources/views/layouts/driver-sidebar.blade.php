@@ -1,13 +1,13 @@
  <!-- Page Sidebar Start-->
  <div class="sidebar-wrapper" data-sidebar-layout="stroke-svg">
      <div>
-        <div class="logo-wrapper"><a href="{{ route('admin.dashboard') }}"><img class="img-fluid for-light"
+        <div class="logo-wrapper"><a href="{{ route('driver.dashboard') }}"><img class="img-fluid for-light"
                     src="{{ asset('assets/images/logo/videzma.png') }}" alt="Videzma"><img class="img-fluid for-dark"
                     src="{{ asset('assets/images/logo/videzma.png') }}" alt="Videzma"></a>
              <div class="back-btn"><i class="fa-solid fa-angle-left"></i></div>
              <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="grid"> </i></div>
          </div>
-        <div class="logo-icon-wrapper"><a href="{{ route('admin.dashboard') }}"><img class="img-fluid"
+        <div class="logo-icon-wrapper"><a href="{{ route('driver.dashboard') }}"><img class="img-fluid"
                     src="{{ asset('assets/images/logo/videzma-icon.png') }}" alt="Videzma"></a></div>
          <nav class="sidebar-main">
              <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
@@ -19,11 +19,11 @@
                      </li>
                      <li class="sidebar-main-title">
                          <div>
-                             <h6>Administration</h6>
+                             <h6>Espace Vidangeur</h6>
                          </div>
                      </li>
                      <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.dashboard') }}">
+                         <a class="sidebar-link sidebar-title link-nav {{ request()->routeIs('driver.dashboard') ? 'active' : '' }}" href="{{ route('driver.dashboard') }}">
                              <svg class="stroke-icon">
                                  <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
                              </svg>
@@ -33,86 +33,55 @@
                          </a>
                      </li>
                      <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.users.index') }}">
+                         <a class="sidebar-link sidebar-title link-nav {{ request()->routeIs('driver.requests.pending') ? 'active' : '' }}" href="{{ route('driver.requests.pending') }}">
                              <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-user') }}"></use>
+                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-alert') }}"></use>
                              </svg>
                              <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-user') }}"></use>
-                             </svg><span>Utilisateurs</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-main-title">
-                         <div>
-                             <h6>Gestion des Services</h6>
-                         </div>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.drivers.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-contact') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-contact') }}"></use>
-                             </svg><span>Vidangeurs</span>
+                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-alert') }}"></use>
+                             </svg><span>Demandes en attente</span>
                          </a>
                      </li>
                      <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.driver-documents.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-file') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-file') }}"></use>
-                             </svg><span>Documents vidangeurs</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.service-requests.index') }}">
+                         <a class="sidebar-link sidebar-title link-nav {{ request()->routeIs('driver.requests.*') && !request()->routeIs('driver.requests.pending') ? 'active' : '' }}" href="{{ route('driver.requests.index') }}">
                              <svg class="stroke-icon">
                                  <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-calendar') }}"></use>
                              </svg>
                              <svg class="fill-icon">
                                  <use href="{{ asset('assets/svg/icon-sprite.svg#fill-calender') }}"></use>
-                             </svg><span>Demandes de service</span>
+                             </svg><span>Mes interventions</span>
                          </a>
                      </li>
                      <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.interventions.index') }}">
+                         <a class="sidebar-link sidebar-title link-nav {{ request()->routeIs('driver.interventions.*') ? 'active' : '' }}" href="{{ route('driver.interventions.index') }}">
                              <svg class="stroke-icon">
                                  <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-task') }}"></use>
                              </svg>
                              <svg class="fill-icon">
                                  <use href="{{ asset('assets/svg/icon-sprite.svg#fill-task') }}"></use>
-                             </svg><span>Interventions</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-main-title">
-                         <div>
-                             <h6>Outils</h6>
-                         </div>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.locations.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-maps') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-maps') }}"></use>
-                             </svg><span>Localisations</span>
+                             </svg><span>Historique</span>
                          </a>
                      </li>
                      <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.notifications.index') }}">
+                         <a class="sidebar-link sidebar-title link-nav {{ request()->routeIs('driver.availability.*') ? 'active' : '' }}" href="{{ route('driver.availability.index') }}">
                              <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-email') }}"></use>
+                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-time') }}"></use>
                              </svg>
                              <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-email') }}"></use>
-                             </svg><span>Notifications</span>
+                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-time') }}"></use>
+                             </svg><span>Disponibilites</span>
                          </a>
                      </li>
-
+                     <li class="sidebar-list">
+                         <a class="sidebar-link sidebar-title link-nav {{ request()->routeIs('driver.profile.*') ? 'active' : '' }}" href="{{ route('driver.profile.show') }}">
+                             <svg class="stroke-icon">
+                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-user') }}"></use>
+                             </svg>
+                             <svg class="fill-icon">
+                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-user') }}"></use>
+                             </svg><span>Mon profil</span>
+                         </a>
+                     </li>
                  </ul>
              </div>
              <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>

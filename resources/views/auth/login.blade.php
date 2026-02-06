@@ -31,7 +31,7 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(10, 28, 40, 0.85), rgba(10, 28, 40, 0.6) 50%, rgba(10, 28, 40, 0.85));
+            background: linear-gradient(135deg, rgba(76, 176, 80, 0.15), rgba(241, 90, 34, 0.25) 50%, rgba(247, 148, 29, 0.15));
             z-index: 1;
         }
 
@@ -59,7 +59,7 @@
         }
 
         .auth-brand img {
-            height: 44px;
+            height: 80px;
         }
 
         .auth-title {
@@ -95,11 +95,11 @@
         <div class="auth-card card">
             <div class="card-body">
                 <div class="auth-brand">
-                    <img src="{{ asset('assets/images/logo/wadnou2.png') }}" alt="Wadnou">
+                    <img src="{{ asset('assets/images/logo/videzma.png') }}" alt="Videzma">
                 </div>
                 <div class="text-center">
-                    <h4 class="auth-title">Connexion admin</h4>
-                    <p class="auth-subtitle">Connectez-vous pour gerer WADNOU.</p>
+                    <h4 class="auth-title">Administration Videzma</h4>
+                    <p class="auth-subtitle">Connectez-vous pour acceder a votre espace.</p>
                 </div>
                 @if ($errors->any())
                     <div class="alert alert-danger">

@@ -10,7 +10,7 @@ class LocationsSeeder extends Seeder
 {
     public function run(): void
     {
-        $users = User::whereIn('role', ['patient', 'doctor'])->get();
+        $users = User::whereIn('role', ['client', 'driver'])->get();
         $districts = [
             'Plateau',
             'Medina',

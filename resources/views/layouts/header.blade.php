@@ -15,8 +15,8 @@
             </div>
         </form>
         <div class="header-logo-wrapper col-auto p-0">
-            <div class="logo-wrapper"><a href="{{ route('admin.dashboard') }}"><img class="img-fluid"
-                        src="{{ asset('assets/images/logo/wadnou2.png') }}" alt="Wadnou"></a></div>
+            <div class="logo-wrapper"><a href="{{ route('admin.dashboard') }}"><img class="img-fluid" style="height: 45px;"
+                        src="{{ asset('assets/images/logo/videzma.png') }}" alt="Videzma"></a></div>
             <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i>
             </div>
         </div>
@@ -31,7 +31,7 @@
                 </li>
                 <li class="profile-nav onhover-dropdown pe-0 py-0">
                     @php($currentUser = auth()->user())
-                    @php($roleLabels = ['admin' => 'Admin', 'doctor' => 'Medecin', 'patient' => 'Patient'])
+                    @php($roleLabels = ['admin' => 'Admin', 'driver' => 'Vidangeur', 'client' => 'Client'])
                     <div class="d-flex profile-media"><img class="b-r-10"
                             src="{{ asset('assets/images/dashboard/profile.png') }}" alt="">
                         <div class="flex-grow-1"><span>{{ $currentUser?->name ?? 'Invite' }}</span>

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ConsultationRequest;
+use App\Models\ServiceRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -11,44 +11,44 @@ class LocationsController extends Controller
 {
     public function index(Request $request)
     {
-        $doctors = User::where('role', 'doctor')->orderBy('name')->get();
-        $selectedDoctor = $request->input('doctor_id');
+        $drivers = User::where('role', 'driver')->orderBy('name')->get();
+        $selectedDriver = $request->input('driver_id');
         $search = $request->input('search');
 
-        $patientsQuery = User::where('role', 'patient')->with('latestLocation');
-        $doctor = null;
-        $doctorLocation = null;
+        $clientsQuery = User::where('role', 'client')->with('latestLocation');
+        $driver = null;
+        $driverLocation = null;
 
-        if ($selectedDoctor) {
-            $doctor = User::where('role', 'doctor')->with('latestLocation')->find($selectedDoctor);
-            $doctorLocation = $doctor?->latestLocation;
+        if ($selectedDriver) {
+            $driver = User::where('role', 'driver')->with('latestLocation')->find($selectedDriver);
+            $driverLocation = $driver?->latestLocation;
 
-            $patientIds = ConsultationRequest::where('doctor_id', $selectedDoctor)
-                ->whereNotNull('patient_id')
+            $clientIds = ServiceRequest::where('driver_id', $selectedDriver)
+                ->whereNotNull('client_id')
                 ->distinct()
-                ->pluck('patient_id');
+                ->pluck('client_id');
 
-            $patientsQuery->whereIn('id', $patientIds);
+            $clientsQuery->whereIn('id', $clientIds);
         }
 
         if ($search) {
-            $patientsQuery->where(function ($query) use ($search) {
+            $clientsQuery->where(function ($query) use ($search) {
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('email', 'like', '%' . $search . '%');
             });
         }
 
-        $patients = $patientsQuery->orderBy('name')->get();
+        $clients = $clientsQuery->orderBy('name')->get();
 
-        $mapPatients = $patients->filter(function (User $patient) {
-            return $patient->latestLocation !== null;
-        })->map(function (User $patient) {
-            $location = $patient->latestLocation;
+        $mapClients = $clients->filter(function (User $client) {
+            return $client->latestLocation !== null;
+        })->map(function (User $client) {
+            $location = $client->latestLocation;
             $timestamp = $location->captured_at ?? $location->created_at;
 
             return [
-                'id' => $patient->id,
-                'name' => $patient->name,
+                'id' => $client->id,
+                'name' => $client->name,
                 'latitude' => (float) $location->latitude,
                 'longitude' => (float) $location->longitude,
                 'address' => $location->address,
@@ -58,26 +58,26 @@ class LocationsController extends Controller
 
         $mapsKey = config('services.google_maps.key');
         $mapId = config('services.google_maps.map_id');
-        $doctorMap = null;
+        $driverMap = null;
 
-        if ($doctor && $doctorLocation) {
-            $doctorMap = [
-                'id' => $doctor->id,
-                'name' => $doctor->name,
-                'latitude' => (float) $doctorLocation->latitude,
-                'longitude' => (float) $doctorLocation->longitude,
+        if ($driver && $driverLocation) {
+            $driverMap = [
+                'id' => $driver->id,
+                'name' => $driver->name,
+                'latitude' => (float) $driverLocation->latitude,
+                'longitude' => (float) $driverLocation->longitude,
             ];
         }
 
         return view('admin.locations.index', [
-            'doctors' => $doctors,
-            'patients' => $patients,
-            'mapPatients' => $mapPatients,
-            'selectedDoctor' => $selectedDoctor,
+            'drivers' => $drivers,
+            'clients' => $clients,
+            'mapClients' => $mapClients,
+            'selectedDriver' => $selectedDriver,
             'search' => $search,
             'mapsKey' => $mapsKey,
             'mapId' => $mapId,
-            'doctorMap' => $doctorMap,
+            'driverMap' => $driverMap,
         ]);
     }
 }

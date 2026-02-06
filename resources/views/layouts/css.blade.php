@@ -21,6 +21,8 @@
 <link id="color" rel="stylesheet" href="{{ asset('assets/css/color-1.css') }}" media="screen">
 <!-- Responsive css-->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/responsive.css') }}">
+<!-- Videzma Theme css (must be after style.css to override) -->
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/videzma-theme.css') }}">
 <!-- Custom css-->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/custom.css') }}">
 @yield('css')

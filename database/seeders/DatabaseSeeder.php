@@ -14,19 +14,15 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminUserSeeder::class,
             UsersSeeder::class,
-            PatientProfilesSeeder::class,
-            DoctorProfilesSeeder::class,
-            DoctorDocumentsSeeder::class,
+            ClientProfilesSeeder::class,
+            DriverProfilesSeeder::class,
+            DriverDocumentsSeeder::class,
             LocationsSeeder::class,
-            SlaSeeder::class,
-            ConsultationsSeeder::class,
-            AppointmentsSeeder::class,
-            AvailabilitiesSeeder::class,
+            ServiceRequestsSeeder::class,
+            InterventionsSeeder::class,
             NotificationPreferencesSeeder::class,
             DeviceTokensSeeder::class,
             NotificationsSeeder::class,
-            NavigationSeeder::class,
-            AuditActionsSeeder::class,
         ]);
     }
 }

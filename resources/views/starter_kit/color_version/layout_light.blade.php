@@ -33,11 +33,11 @@
                     <h5>Page de demarrage</h5>
                 </div>
                 <div class="card-body">
-                    <p>Cette page est un exemple du template Cuba. Adaptez la structure, la navigation et le branding pour Wadnou.</p>
+                    <p>Cette page est un exemple du template Cuba. Adaptez la structure, la navigation et le branding pour Videzma.</p>
                     <ul>
                         <li>Gardez les composants utiles et retirez le reste.</li>
                         <li>Utilisez les variables SCSS pour personnaliser les couleurs.</li>
-                        <li>Remplacez les logos et les textes par le contenu Wadnou.</li>
+                        <li>Remplacez les logos et les textes par le contenu Videzma.</li>
                     </ul>
                 </div>
             </div>

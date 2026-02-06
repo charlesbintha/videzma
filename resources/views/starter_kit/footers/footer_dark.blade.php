@@ -33,7 +33,7 @@
                     <h5>Exemple de pied de page</h5>
                 </div>
                 <div class="card-body">
-                    <p>Ce gabarit sert a presenter un pied de page sombre. Adaptez le contenu aux pages admin Wadnou.</p>
+                    <p>Ce gabarit sert a presenter un pied de page sombre. Adaptez le contenu aux pages admin Videzma.</p>
                     <ul>
                         <li>Assurez un contraste lisible avec le fond sombre.</li>
                         <li>Regroupez les liens utiles (support, contact, aide).</li>

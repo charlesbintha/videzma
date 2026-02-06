@@ -9,24 +9,26 @@ class UsersSeeder extends Seeder
 {
     public function run(): void
     {
-        if (User::whereIn('role', ['patient', 'doctor'])->exists()) {
+        if (User::whereIn('role', ['client', 'driver'])->exists()) {
             return;
         }
 
+        // Créer des clients
         User::factory()
             ->count(20)
             ->state(fn () => [
-                'role' => 'patient',
+                'role' => 'client',
                 'status' => 'active',
                 'phone' => fake()->phoneNumber(),
                 'locale' => 'fr',
             ])
             ->create();
 
+        // Créer des vidangeurs
         User::factory()
             ->count(8)
             ->state(fn () => [
-                'role' => 'doctor',
+                'role' => 'driver',
                 'status' => 'active',
                 'phone' => fake()->phoneNumber(),
                 'locale' => 'fr',

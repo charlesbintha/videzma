@@ -1,0 +1,312 @@
+/**
+ * Videzma Custom Theme
+ * Colors extracted from logo:
+ * - Green: #4CB050
+ * - Orange: #F15A22
+ * - Yellow/Gold: #F7941D
+ */
+
+:root {
+  /* Primary theme color - Orange Videzma */
+  --theme-default: #F15A22;
+  --theme-default-rgb: 241, 90, 34;
+
+  /* Secondary theme color - Green Videzma */
+  --theme-secondary: #4CB050;
+  --theme-secondary-rgb: 76, 176, 80;
+
+  /* Accent color - Yellow/Gold */
+  --theme-accent: #F7941D;
+  --theme-accent-rgb: 247, 148, 29;
+
+  /* Body and text colors */
+  --body-font-color: #2F2F3B;
+  --light-background: rgba(76, 176, 80, 0.1);
+  --light-semi-gray: #F5F6F9;
+  --light-gray: #F1F3F5;
+  --light-bg: #EEF5EE;
+
+  /* Chart colors */
+  --chart-border: #E6EDEF;
+  --chart-progress-light: #E0E9E0;
+  --chart-progress-dark: #4CB050;
+
+  /* Card shadow with theme color */
+  --card-box-shadow: 0 1px 2px rgba(241, 90, 34, 0.08);
+
+  /* Recent activity dot colors */
+  --recent-dot-primary: #F15A22;
+  --recent-dot-secondary: #4CB050;
+  --recent-dot-accent: #F7941D;
+
+  /* Calendar colors */
+  --fc-button-bg-color: var(--theme-default);
+  --fc-button-active-bg-color: #D94E1D;
+  --fc-button-active-border-color: #D94E1D;
+  --fc-button-border-color: var(--theme-default);
+  --fc-button-hover-bg-color: #D94E1D;
+  --fc-button-hover-border-color: #D94E1D;
+}
+
+/* Override sidebar active states */
+.sidebar-wrapper .sidebar-main .sidebar-links .sidebar-list > a.active,
+.sidebar-wrapper .sidebar-main .sidebar-links .sidebar-list > a:hover {
+  background-color: rgba(241, 90, 34, 0.1);
+}
+
+.sidebar-wrapper .sidebar-main .sidebar-links .sidebar-list > a.active svg,
+.sidebar-wrapper .sidebar-main .sidebar-links .sidebar-list > a:hover svg {
+  stroke: var(--theme-default);
+}
+
+/* Primary button styling */
+.btn-primary {
+  background-color: var(--theme-default) !important;
+  border-color: var(--theme-default) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: #D94E1D !important;
+  border-color: #D94E1D !important;
+}
+
+/* Secondary button (green) */
+.btn-secondary {
+  background-color: var(--theme-secondary) !important;
+  border-color: var(--theme-secondary) !important;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active {
+  background-color: #3D9140 !important;
+  border-color: #3D9140 !important;
+}
+
+/* Outline buttons */
+.btn-outline-primary {
+  color: var(--theme-default) !important;
+  border-color: var(--theme-default) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--theme-default) !important;
+  color: #fff !important;
+}
+
+/* Links */
+a {
+  color: var(--theme-default);
+}
+
+a:hover {
+  color: #D94E1D;
+}
+
+/* Badge primary */
+.badge-primary,
+.badge.bg-primary {
+  background-color: var(--theme-default) !important;
+}
+
+/* Success badges and alerts use green */
+.badge-success,
+.badge.bg-success,
+.alert-success {
+  background-color: var(--theme-secondary) !important;
+}
+
+/* Warning badges use yellow/gold */
+.badge-warning,
+.badge.bg-warning {
+  background-color: var(--theme-accent) !important;
+}
+
+/* Progress bars */
+.progress-bar {
+  background-color: var(--theme-default);
+}
+
+.progress-bar.bg-success {
+  background-color: var(--theme-secondary) !important;
+}
+
+/* Card headers */
+.card .card-header h5,
+.card .card-header h4 {
+  color: var(--theme-default);
+}
+
+/* Page title */
+.page-title h4 {
+  color: var(--body-font-color);
+}
+
+/* Sidebar logo wrapper */
+.sidebar-wrapper .logo-wrapper {
+  padding: 15px 20px;
+}
+
+.sidebar-wrapper .logo-wrapper img {
+  max-height: 50px;
+  width: auto;
+}
+
+/* Sidebar icon wrapper for collapsed state */
+.sidebar-wrapper .logo-icon-wrapper img {
+  max-height: 40px;
+  width: auto;
+}
+
+/* Form focus states */
+.form-control:focus {
+  border-color: var(--theme-default);
+  box-shadow: 0 0 0 0.2rem rgba(241, 90, 34, 0.15);
+}
+
+/* Select2 focus */
+.select2-container--default .select2-selection--single:focus,
+.select2-container--default.select2-container--focus .select2-selection--single {
+  border-color: var(--theme-default);
+}
+
+/* Table hover */
+.table-hover tbody tr:hover {
+  background-color: rgba(241, 90, 34, 0.05);
+}
+
+/* Pagination */
+.page-item.active .page-link {
+  background-color: var(--theme-default);
+  border-color: var(--theme-default);
+}
+
+.page-link {
+  color: var(--theme-default);
+}
+
+.page-link:hover {
+  color: #D94E1D;
+}
+
+/* Nav tabs */
+.nav-tabs .nav-link.active {
+  color: var(--theme-default);
+  border-bottom-color: var(--theme-default);
+}
+
+.nav-pills .nav-link.active {
+  background-color: var(--theme-default);
+}
+
+/* Checkbox and radio custom */
+.form-check-input:checked {
+  background-color: var(--theme-default);
+  border-color: var(--theme-default);
+}
+
+/* Switch toggle */
+.form-switch .form-check-input:checked {
+  background-color: var(--theme-default);
+  border-color: var(--theme-default);
+}
+
+/* Datepicker */
+.datepicker table tr td.active,
+.datepicker table tr td.active:hover {
+  background-color: var(--theme-default) !important;
+}
+
+/* Loader/spinner */
+.loader-wrapper .loader {
+  border-top-color: var(--theme-default);
+}
+
+/* Breadcrumb */
+.breadcrumb-item a {
+  color: var(--theme-default);
+}
+
+/* Dashboard widgets */
+.widget-1 .widget-content .widget-round {
+  background-color: rgba(241, 90, 34, 0.1);
+}
+
+.widget-1 .widget-content .widget-round i,
+.widget-1 .widget-content .widget-round svg {
+  color: var(--theme-default);
+}
+
+/* Success widget uses green */
+.widget-1.success .widget-content .widget-round {
+  background-color: rgba(76, 176, 80, 0.1);
+}
+
+.widget-1.success .widget-content .widget-round i,
+.widget-1.success .widget-content .widget-round svg {
+  color: var(--theme-secondary);
+}
+
+/* Dropdown active items */
+.dropdown-item.active,
+.dropdown-item:active {
+  background-color: var(--theme-default);
+}
+
+/* Toast */
+.toast-primary {
+  background-color: var(--theme-default) !important;
+}
+
+.toast-success {
+  background-color: var(--theme-secondary) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar-thumb {
+  background-color: var(--theme-default);
+}
+
+/* Custom status colors for Videzma */
+.status-pending {
+  background-color: var(--theme-accent);
+  color: #fff;
+}
+
+.status-assigned {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.status-in-progress {
+  background-color: var(--theme-default);
+  color: #fff;
+}
+
+.status-completed {
+  background-color: var(--theme-secondary);
+  color: #fff;
+}
+
+.status-rejected {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+/* Driver/Client specific badges */
+.badge-driver {
+  background-color: var(--theme-secondary);
+  color: #fff;
+}
+
+.badge-client {
+  background-color: var(--theme-default);
+  color: #fff;
+}
+
+.badge-admin {
+  background-color: #6c757d;
+  color: #fff;
+}
