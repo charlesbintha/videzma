@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Driver\CommentsController as DriverCommentsControll
 use App\Http\Controllers\Api\Driver\AvailabilityController as DriverAvailabilityController;
 use App\Http\Controllers\Api\Driver\ProfileController as DriverProfileController;
 use App\Http\Controllers\Api\Driver\NavigationController as DriverNavigationController;
+use App\Http\Controllers\Api\TrackingController;
 
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
@@ -47,7 +48,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('drivers/{driver}', [DriversController::class, 'show']);
     Route::post('drivers/estimate-price', [DriversController::class, 'estimatePrice']);
 
-    // Track driver position (for clients)
+    // Track driver position (for clients) - optimized for polling
+    Route::get('tracking/{serviceRequest}', [TrackingController::class, 'getDriverPosition']);
+    Route::get('tracking/{serviceRequest}/status', [TrackingController::class, 'checkTrackingStatus']);
+
+    // Legacy endpoint (kept for backwards compatibility)
     Route::get('services/{serviceRequest}/driver-position', [DriverNavigationController::class, 'getDriverPosition']);
 
     // Device tokens
