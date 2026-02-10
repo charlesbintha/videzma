@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             DriverProfilesSeeder::class,
             DriverDocumentsSeeder::class,
             LocationsSeeder::class,
+            SubscriptionPlansSeeder::class,
             ServiceRequestsSeeder::class,
             InterventionsSeeder::class,
             NotificationPreferencesSeeder::class,
