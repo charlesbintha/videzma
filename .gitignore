@@ -8,3 +8,8 @@ map.jpeg
 /mobile
 *.txt
 /.claude
+/storage/*.key
+/storage/logs/*
+/storage/framework/views/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
