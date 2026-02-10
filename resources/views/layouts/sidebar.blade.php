@@ -89,6 +89,31 @@
                      </li>
                      <li class="sidebar-main-title">
                          <div>
+                             <h6>Abonnements</h6>
+                         </div>
+                     </li>
+                     <li class="sidebar-list">
+                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.subscription-plans.index') }}">
+                             <svg class="stroke-icon">
+                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-form') }}"></use>
+                             </svg>
+                             <svg class="fill-icon">
+                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-form') }}"></use>
+                             </svg><span>Forfaits</span>
+                         </a>
+                     </li>
+                     <li class="sidebar-list">
+                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.client-subscriptions.index') }}">
+                             <svg class="stroke-icon">
+                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-editors') }}"></use>
+                             </svg>
+                             <svg class="fill-icon">
+                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-editors') }}"></use>
+                             </svg><span>Abonnements clients</span>
+                         </a>
+                     </li>
+                     <li class="sidebar-main-title">
+                         <div>
                              <h6>Outils</h6>
                          </div>
                      </li>

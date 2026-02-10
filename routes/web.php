@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\NotificationsController;
 use App\Http\Controllers\Admin\ServiceRequestsController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\SubscriptionPlansController;
+use App\Http\Controllers\Admin\ClientSubscriptionsController;
 use App\Http\Controllers\Auth\LoginController;
 
 Route::get('/', function () {
@@ -83,4 +84,17 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::put('subscription-plans/{subscriptionPlan}', [SubscriptionPlansController::class, 'update'])->name('subscription-plans.update');
     Route::delete('subscription-plans/{subscriptionPlan}', [SubscriptionPlansController::class, 'destroy'])->name('subscription-plans.destroy');
     Route::post('subscription-plans/{subscriptionPlan}/toggle', [SubscriptionPlansController::class, 'toggle'])->name('subscription-plans.toggle');
+
+    // Client Subscriptions (Abonnements clients)
+    Route::get('client-subscriptions', [ClientSubscriptionsController::class, 'index'])->name('client-subscriptions.index');
+    Route::get('client-subscriptions/create', [ClientSubscriptionsController::class, 'create'])->name('client-subscriptions.create');
+    Route::post('client-subscriptions', [ClientSubscriptionsController::class, 'store'])->name('client-subscriptions.store');
+    Route::get('client-subscriptions/{clientSubscription}', [ClientSubscriptionsController::class, 'show'])->name('client-subscriptions.show');
+    Route::get('client-subscriptions/{clientSubscription}/edit', [ClientSubscriptionsController::class, 'edit'])->name('client-subscriptions.edit');
+    Route::put('client-subscriptions/{clientSubscription}', [ClientSubscriptionsController::class, 'update'])->name('client-subscriptions.update');
+    Route::delete('client-subscriptions/{clientSubscription}', [ClientSubscriptionsController::class, 'destroy'])->name('client-subscriptions.destroy');
+    Route::post('client-subscriptions/{clientSubscription}/pause', [ClientSubscriptionsController::class, 'pause'])->name('client-subscriptions.pause');
+    Route::post('client-subscriptions/{clientSubscription}/resume', [ClientSubscriptionsController::class, 'resume'])->name('client-subscriptions.resume');
+    Route::post('client-subscriptions/{clientSubscription}/renew', [ClientSubscriptionsController::class, 'renew'])->name('client-subscriptions.renew');
+    Route::post('client-subscriptions/{clientSubscription}/mark-paid', [ClientSubscriptionsController::class, 'markPaid'])->name('client-subscriptions.mark-paid');
 });
