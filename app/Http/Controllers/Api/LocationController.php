@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Events\DriverPositionUpdated;
 use App\Models\ConsultationRequest;
 use App\Models\Location;
+use App\Models\ServiceRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -35,9 +37,72 @@ class LocationController extends Controller
                 : now(),
         ]);
 
+        // Si c'est un vidangeur, broadcaster la position aux clients qui le suivent
+        if ($user->role === 'driver') {
+            $this->broadcastDriverPosition($user, $location);
+        }
+
         return response()->json([
             'data' => $this->formatLocation($location),
         ], 201);
+    }
+
+    /**
+     * Broadcast driver position to all active service requests
+     */
+    private function broadcastDriverPosition(User $driver, Location $location): void
+    {
+        // Trouver les demandes de service actives pour ce vidangeur
+        $activeRequests = ServiceRequest::where('driver_id', $driver->id)
+            ->whereIn('status', ['assigned', 'accepted', 'in_progress', 'en_route'])
+            ->with('client')
+            ->get();
+
+        foreach ($activeRequests as $serviceRequest) {
+            // Calculer la distance et l'ETA
+            $distance = null;
+            $eta = null;
+
+            // Utiliser la location de la demande de service pour calculer la distance
+            $clientLocation = $serviceRequest->location;
+            if ($clientLocation && $clientLocation->latitude && $clientLocation->longitude) {
+                $distance = $this->calculateDistance(
+                    $location->latitude,
+                    $location->longitude,
+                    $clientLocation->latitude,
+                    $clientLocation->longitude
+                );
+                // Estimation: 30 km/h en ville
+                $eta = $distance > 0 ? (int) ceil(($distance / 1000) / 30 * 60) : 0;
+            }
+
+            // Broadcaster l'événement
+            broadcast(new DriverPositionUpdated(
+                $serviceRequest,
+                $location,
+                $distance,
+                $eta
+            ))->toOthers();
+        }
+    }
+
+    /**
+     * Calculate distance between two points using Haversine formula
+     */
+    private function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): int
+    {
+        $earthRadius = 6371000; // metres
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon / 2) * sin($dLon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return (int) round($earthRadius * $c);
     }
 
     public function index(Request $request, User $patient)

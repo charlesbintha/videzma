@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Driver\ProfileController as DriverProfileController
 use App\Http\Controllers\Api\Driver\NavigationController as DriverNavigationController;
 use App\Http\Controllers\Api\TrackingController;
 use App\Http\Controllers\Api\SubscriptionsController;
+use App\Http\Controllers\Api\BroadcastAuthController;
 
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
@@ -22,6 +23,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('auth/me', [AuthController::class, 'me']);
     Route::patch('auth/me', [AuthController::class, 'update']);
     Route::post('auth/logout', [AuthController::class, 'logout']);
+
+    // WebSocket authentication for mobile apps
+    Route::post('broadcasting/auth', [BroadcastAuthController::class, 'authenticate']);
 
     // Locations
     Route::post('locations', [LocationController::class, 'store']);
