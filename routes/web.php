@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ServiceRequestsController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\SubscriptionPlansController;
 use App\Http\Controllers\Admin\ClientSubscriptionsController;
+use App\Http\Controllers\Admin\PaymentsController;
 use App\Http\Controllers\Auth\LoginController;
 
 Route::get('/', function () {
@@ -31,6 +32,15 @@ Route::view('hide-menu-on-scroll', 'starter_kit.hide_menu_on_scroll')->name('hid
 Route::view('footer-light', 'starter_kit.footers.footer_light')->name('footer_light');
 Route::view('footer-dark', 'starter_kit.footers.footer_dark')->name('footer_dark');
 Route::view('footer-fixed', 'starter_kit.footers.footer_fixed')->name('footer_fixed');
+
+// Pages de retour Paytech (interceptées par le WebView Flutter)
+Route::get('/payment/success', function () {
+    return response()->json(['status' => 'success', 'message' => 'Paiement effectué avec succès.']);
+})->name('payment.success');
+
+Route::get('/payment/cancel', function () {
+    return response()->json(['status' => 'canceled', 'message' => 'Paiement annulé.']);
+})->name('payment.cancel');
 
 Route::get('login', [LoginController::class, 'show'])->name('login');
 Route::post('login', [LoginController::class, 'authenticate'])->name('login.submit');
@@ -64,6 +74,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('service-requests/{serviceRequest}', [ServiceRequestsController::class, 'show'])->name('service-requests.show');
     Route::patch('service-requests/{serviceRequest}', [ServiceRequestsController::class, 'update'])->name('service-requests.update');
     Route::post('service-requests/{serviceRequest}/assign', [ServiceRequestsController::class, 'assignDriver'])->name('service-requests.assign');
+    Route::post('service-requests/{serviceRequest}/mark-paid', [ServiceRequestsController::class, 'markPaid'])->name('service-requests.mark-paid');
 
     // Interventions
     Route::get('interventions', [InterventionsController::class, 'index'])->name('interventions.index');
@@ -86,6 +97,9 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::post('subscription-plans/{subscriptionPlan}/toggle', [SubscriptionPlansController::class, 'toggle'])->name('subscription-plans.toggle');
 
     // Client Subscriptions (Abonnements clients)
+    // Paiements (récapitulatif)
+    Route::get('payments', [PaymentsController::class, 'index'])->name('payments.index');
+
     Route::get('client-subscriptions', [ClientSubscriptionsController::class, 'index'])->name('client-subscriptions.index');
     Route::get('client-subscriptions/create', [ClientSubscriptionsController::class, 'create'])->name('client-subscriptions.create');
     Route::post('client-subscriptions', [ClientSubscriptionsController::class, 'store'])->name('client-subscriptions.store');

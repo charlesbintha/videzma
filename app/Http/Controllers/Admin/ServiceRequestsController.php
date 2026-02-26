@@ -21,6 +21,10 @@ class ServiceRequestsController extends Controller
             $query->where('driver_id', $driverId);
         }
 
+        if ($paymentStatus = $request->get('payment_status')) {
+            $query->where('payment_status', $paymentStatus);
+        }
+
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('address', 'like', "%{$search}%")
@@ -31,8 +35,9 @@ class ServiceRequestsController extends Controller
         $requests = $query->latest('requested_at')->paginate(15)->withQueryString();
         $drivers = User::where('role', 'driver')->orderBy('name')->get();
         $statuses = ['pending', 'assigned', 'accepted', 'rejected', 'in_progress', 'completed', 'cancelled'];
+        $paymentStatuses = ['pending' => 'En attente', 'paid' => 'Payé', 'failed' => 'Échoué'];
 
-        return view('admin.service-requests.index', compact('requests', 'drivers', 'statuses'));
+        return view('admin.service-requests.index', compact('requests', 'drivers', 'statuses', 'paymentStatuses'));
     }
 
     public function show($id)
@@ -107,6 +112,24 @@ class ServiceRequestsController extends Controller
 
         return redirect()->route('admin.service-requests.show', $serviceRequest->id)
             ->with('success', 'Demande mise a jour avec succes.');
+    }
+
+    public function markPaid($id)
+    {
+        $serviceRequest = ServiceRequest::findOrFail($id);
+
+        if ($serviceRequest->payment_status === 'paid') {
+            return redirect()->route('admin.service-requests.show', $id)
+                ->with('error', 'Cette demande est déjà marquée comme payée.');
+        }
+
+        $serviceRequest->update([
+            'payment_status' => 'paid',
+            'paid_at'        => now(),
+        ]);
+
+        return redirect()->route('admin.service-requests.show', $id)
+            ->with('success', 'Paiement confirmé manuellement.');
     }
 
     public function assignDriver(Request $request, $id)

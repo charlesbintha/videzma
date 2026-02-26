@@ -109,21 +109,50 @@
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <h6 class="text-muted mb-2">Prix</h6>
-                            <p class="fs-4 text-primary">{{ number_format($serviceRequest->price_amount ?? 0, 0, ',', ' ') }} FCFA</p>
+                            <p class="fs-4 text-primary fw-bold">{{ number_format($serviceRequest->price_amount ?? 0, 0, ',', ' ') }} FCFA</p>
                         </div>
                         <div class="col-md-4">
                             <h6 class="text-muted mb-2">Mode de paiement</h6>
-                            <p>{{ ucfirst(str_replace('_', ' ', $serviceRequest->payment_method ?? '-')) }}</p>
+                            @php
+                                $methodLabels = ['orange_money' => 'Orange Money', 'wave' => 'Wave', 'cash' => 'Espèces', 'card' => 'Carte'];
+                                $methodIcons  = ['orange_money' => '📱', 'wave' => '🌊', 'cash' => '💵', 'card' => '💳'];
+                                $method = $serviceRequest->payment_method ?? 'cash';
+                            @endphp
+                            <p>{{ ($methodIcons[$method] ?? '') . ' ' . ($methodLabels[$method] ?? ucfirst($method)) }}</p>
                         </div>
                         <div class="col-md-4">
                             <h6 class="text-muted mb-2">Statut paiement</h6>
                             @if($serviceRequest->payment_status === 'paid')
-                                <span class="badge bg-success">Paye</span>
+                                <span class="badge bg-success fs-6">✓ Payé</span>
+                                @if($serviceRequest->paid_at)
+                                    <p class="text-muted small mt-1 mb-0">{{ $serviceRequest->paid_at->format('d/m/Y H:i') }}</p>
+                                @endif
+                            @elseif($serviceRequest->payment_status === 'failed')
+                                <span class="badge bg-danger fs-6">✗ Échoué</span>
                             @else
-                                <span class="badge bg-warning">En attente</span>
+                                <span class="badge bg-warning fs-6">⏳ En attente</span>
                             @endif
                         </div>
                     </div>
+
+                    @if($serviceRequest->payment_reference || $serviceRequest->payment_token)
+                    <div class="row mb-4">
+                        @if($serviceRequest->payment_reference)
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Référence Paytech</h6>
+                            <code class="small">{{ $serviceRequest->payment_reference }}</code>
+                        </div>
+                        @endif
+                        @if($serviceRequest->payment_token)
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Token Paytech</h6>
+                            <code class="small text-truncate d-block" style="max-width:200px" title="{{ $serviceRequest->payment_token }}">
+                                {{ Str::limit($serviceRequest->payment_token, 24) }}
+                            </code>
+                        </div>
+                        @endif
+                    </div>
+                    @endif
 
                     @if($serviceRequest->client_notes)
                         <div class="mb-4">
@@ -195,6 +224,39 @@
         </div>
 
         <div class="col-xl-4">
+            {{-- Paiement --}}
+            <div class="card @if($serviceRequest->payment_status === 'paid') border-success @elseif($serviceRequest->payment_status === 'failed') border-danger @else border-warning @endif mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Paiement</h5>
+                    @if($serviceRequest->payment_status === 'paid')
+                        <span class="badge bg-success">Payé</span>
+                    @elseif($serviceRequest->payment_status === 'failed')
+                        <span class="badge bg-danger">Échoué</span>
+                    @else
+                        <span class="badge bg-warning">En attente</span>
+                    @endif
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Montant :</strong> {{ number_format($serviceRequest->price_amount ?? 0, 0, ',', ' ') }} FCFA</p>
+                    @php
+                        $methodLabels = ['orange_money' => 'Orange Money', 'wave' => 'Wave', 'cash' => 'Espèces', 'card' => 'Carte'];
+                    @endphp
+                    <p class="mb-1"><strong>Moyen :</strong> {{ $methodLabels[$serviceRequest->payment_method ?? ''] ?? '-' }}</p>
+                    @if($serviceRequest->paid_at)
+                        <p class="mb-3"><strong>Payé le :</strong> {{ $serviceRequest->paid_at->format('d/m/Y H:i') }}</p>
+                    @endif
+                    @if($serviceRequest->payment_status !== 'paid')
+                        <form action="{{ route('admin.service-requests.mark-paid', $serviceRequest) }}" method="POST"
+                              onsubmit="return confirm('Confirmer le paiement manuel de {{ number_format($serviceRequest->price_amount ?? 0, 0, \',\', \' \') }} FCFA ?')">
+                            @csrf
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fa fa-check me-1"></i> Marquer comme payé
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+
             @if($serviceRequest->status === 'pending' || $serviceRequest->status === 'assigned')
             <div class="card">
                 <div class="card-header">

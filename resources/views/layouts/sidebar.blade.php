@@ -112,6 +112,16 @@
                              </svg><span>Abonnements clients</span>
                          </a>
                      </li>
+                     <li class="sidebar-list">
+                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.payments.index') }}">
+                             <svg class="stroke-icon">
+                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-ecommerce') }}"></use>
+                             </svg>
+                             <svg class="fill-icon">
+                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-ecommerce') }}"></use>
+                             </svg><span>Paiements</span>
+                         </a>
+                     </li>
                      <li class="sidebar-main-title">
                          <div>
                              <h6>Outils</h6>

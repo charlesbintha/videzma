@@ -28,6 +28,7 @@ class ServiceRequest extends Model
         'payment_method',
         'payment_status',
         'payment_reference',
+        'payment_token',
         'paid_at',
         'status',
         'notes',

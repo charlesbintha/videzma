@@ -25,6 +25,8 @@ class ClientSubscription extends Model
         'volume_used',
         'payment_method',
         'payment_status',
+        'payment_token',
+        'payment_reference',
         'paid_at',
         'auto_renew',
         'cancelled_at',

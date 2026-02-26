@@ -46,8 +46,23 @@
                     </select>
                 </div>
                 <div class="col-md-2">
+                    <select name="payment_status" class="form-select">
+                        <option value="">Tout paiement</option>
+                        @foreach ($paymentStatuses as $val => $label)
+                            <option value="{{ $val }}" @selected(request('payment_status') === $val)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
                     <button type="submit" class="btn btn-secondary w-100">Filtrer</button>
                 </div>
+                @if(request()->hasAny(['search','status','driver_id','payment_status']))
+                <div class="col-md-1">
+                    <a href="{{ route('admin.service-requests.index') }}" class="btn btn-outline-secondary w-100" title="Réinitialiser">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+                @endif
             </form>
 
             <div class="table-responsive">
@@ -59,6 +74,8 @@
                             <th>Adresse</th>
                             <th>Vidangeur</th>
                             <th>Statut</th>
+                            <th>Paiement</th>
+                            <th>Prix</th>
                             <th>Date demande</th>
                             <th>Actions</th>
                         </tr>
@@ -95,6 +112,20 @@
                                             <span class="badge bg-secondary">{{ $request->status }}</span>
                                     @endswitch
                                 </td>
+                                <td>
+                                    @if($request->payment_status === 'paid')
+                                        <span class="badge bg-success">Payé</span>
+                                    @elseif($request->payment_status === 'failed')
+                                        <span class="badge bg-danger">Échoué</span>
+                                    @else
+                                        @if($request->payment_method === 'cash')
+                                            <span class="badge bg-secondary">Espèces</span>
+                                        @else
+                                            <span class="badge bg-warning">En attente</span>
+                                        @endif
+                                    @endif
+                                </td>
+                                <td class="text-nowrap">{{ number_format($request->price_amount ?? 0, 0, ',', ' ') }} F</td>
                                 <td>{{ $request->requested_at?->format('d/m/Y H:i') ?? '-' }}</td>
                                 <td>
                                     <a href="{{ route('admin.service-requests.show', $request) }}" class="btn btn-sm btn-info">
@@ -104,7 +135,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center">Aucune demande trouvee.</td>
+                                <td colspan="9" class="text-center">Aucune demande trouvee.</td>
                             </tr>
                         @endforelse
                     </tbody>

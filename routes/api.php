@@ -15,9 +15,13 @@ use App\Http\Controllers\Api\Driver\NavigationController as DriverNavigationCont
 use App\Http\Controllers\Api\TrackingController;
 use App\Http\Controllers\Api\SubscriptionsController;
 use App\Http\Controllers\Api\BroadcastAuthController;
+use App\Http\Controllers\Api\PaymentController;
 
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
+
+// IPN Paytech — route publique (appelée par les serveurs Paytech)
+Route::post('payments/ipn', [PaymentController::class, 'ipn']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('auth/me', [AuthController::class, 'me']);
@@ -63,6 +67,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Device tokens
     Route::post('device-tokens', [AuthController::class, 'registerDeviceToken']);
     Route::delete('device-tokens', [AuthController::class, 'removeDeviceToken']);
+
+    // Paiements Paytech
+    Route::post('payments/service/{serviceRequest}/initiate', [PaymentController::class, 'initiateService']);
+    Route::get('payments/service/{serviceRequest}/status', [PaymentController::class, 'statusService']);
+    Route::post('payments/subscription/{subscription}/initiate', [PaymentController::class, 'initiateSubscription']);
+    Route::get('payments/subscription/{subscription}/status', [PaymentController::class, 'statusSubscription']);
 
     // Subscriptions (Forfaits)
     Route::get('subscriptions/plans', [SubscriptionsController::class, 'plans']);
