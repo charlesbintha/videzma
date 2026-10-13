@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ServiceRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ServiceRequestsController extends Controller
 {
@@ -28,13 +29,13 @@ class ServiceRequestsController extends Controller
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('address', 'like', "%{$search}%")
-                  ->orWhereHas('client', fn($q2) => $q2->where('name', 'like', "%{$search}%"));
+                    ->orWhereHas('client', fn ($q2) => $q2->where('name', 'like', "%{$search}%"));
             });
         }
 
         $requests = $query->latest('requested_at')->paginate(15)->withQueryString();
         $drivers = User::where('role', 'driver')->orderBy('name')->get();
-        $statuses = ['pending', 'assigned', 'accepted', 'rejected', 'in_progress', 'completed', 'cancelled'];
+        $statuses = ['pending', 'assigned', 'accepted', 'rejected', 'in_progress', 'completed', 'canceled'];
         $paymentStatuses = ['pending' => 'En attente', 'paid' => 'Payé', 'failed' => 'Échoué'];
 
         return view('admin.service-requests.index', compact('requests', 'drivers', 'statuses', 'paymentStatuses'));
@@ -44,7 +45,8 @@ class ServiceRequestsController extends Controller
     {
         $serviceRequest = ServiceRequest::with(['client', 'driver', 'location', 'intervention'])->findOrFail($id);
         $drivers = User::where('role', 'driver')
-            ->whereHas('driverProfile', fn($q) => $q->where('verification_status', 'approved'))
+            ->where('status', 'active')
+            ->whereHas('driverProfile', fn ($q) => $q->where('verification_status', 'approved'))
             ->orderBy('name')
             ->get();
 
@@ -56,8 +58,8 @@ class ServiceRequestsController extends Controller
         $serviceRequest = ServiceRequest::findOrFail($id);
 
         $validated = $request->validate([
-            'status' => 'sometimes|in:pending,assigned,accepted,rejected,in_progress,completed,cancelled',
-            'driver_id' => 'nullable|exists:users,id',
+            'status' => 'sometimes|in:pending,assigned,accepted,rejected,in_progress,completed,canceled',
+            'driver_id' => ['nullable', Rule::exists('users', 'id')->where('role', 'driver')->where('status', 'active')->whereIn('id', \Illuminate\Support\Facades\DB::table('driver_profiles')->select('user_id')->where('verification_status', 'approved'))],
             'admin_notes' => 'nullable|string|max:1000',
         ]);
 
@@ -69,36 +71,43 @@ class ServiceRequestsController extends Controller
             // Mettre à jour les timestamps selon le statut
             switch ($validated['status']) {
                 case 'assigned':
-                    if (!$serviceRequest->assigned_at) {
+                    if (! $serviceRequest->assigned_at) {
                         $updateData['assigned_at'] = now();
                     }
                     break;
                 case 'accepted':
-                    if (!$serviceRequest->accepted_at) {
+                    if (! $serviceRequest->accepted_at) {
                         $updateData['accepted_at'] = now();
                     }
                     break;
                 case 'rejected':
-                    if (!$serviceRequest->rejected_at) {
+                    if (! $serviceRequest->rejected_at) {
                         $updateData['rejected_at'] = now();
                     }
                     break;
                 case 'in_progress':
-                    if (!$serviceRequest->started_at) {
+                    if (! $serviceRequest->started_at) {
                         $updateData['started_at'] = now();
                     }
                     break;
+                case 'canceled':
+                    $updateData['canceled_at'] = $serviceRequest->canceled_at ?? now();
+                    break;
                 case 'completed':
-                    if (!$serviceRequest->completed_at) {
+                    if (! $serviceRequest->completed_at) {
                         $updateData['completed_at'] = now();
                     }
                     break;
             }
         }
 
+        if (isset($validated['driver_id']) && ! in_array($serviceRequest->status, ['pending', 'assigned'], true)) {
+            return back()->withErrors(['driver_id' => 'Cette demande ne peut plus être réaffectée.']);
+        }
+
         if (isset($validated['driver_id'])) {
             $updateData['driver_id'] = $validated['driver_id'];
-            if ($validated['driver_id'] && !$serviceRequest->assigned_at) {
+            if ($validated['driver_id'] && ! $serviceRequest->assigned_at) {
                 $updateData['assigned_at'] = now();
                 $updateData['status'] = 'assigned';
             }
@@ -125,7 +134,7 @@ class ServiceRequestsController extends Controller
 
         $serviceRequest->update([
             'payment_status' => 'paid',
-            'paid_at'        => now(),
+            'paid_at' => now(),
         ]);
 
         return redirect()->route('admin.service-requests.show', $id)
@@ -137,8 +146,12 @@ class ServiceRequestsController extends Controller
         $serviceRequest = ServiceRequest::findOrFail($id);
 
         $validated = $request->validate([
-            'driver_id' => 'required|exists:users,id',
+            'driver_id' => ['required', Rule::exists('users', 'id')->where('role', 'driver')->where('status', 'active')->whereIn('id', \Illuminate\Support\Facades\DB::table('driver_profiles')->select('user_id')->where('verification_status', 'approved'))],
         ]);
+
+        if (! in_array($serviceRequest->status, ['pending', 'assigned'], true)) {
+            return back()->withErrors(['driver_id' => 'Seule une demande en attente ou assignée peut être affectée.']);
+        }
 
         $serviceRequest->update([
             'driver_id' => $validated['driver_id'],

@@ -29,24 +29,24 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Cette demande est déjà payée.'], 422);
         }
 
-        if (!in_array($serviceRequest->payment_method, ['orange_money', 'wave'])) {
+        if (! in_array($serviceRequest->payment_method, ['orange_money', 'wave'])) {
             return response()->json(['message' => 'Paiement en espèces, aucune action en ligne requise.'], 422);
         }
 
-        $refCommand = 'SR-' . $serviceRequest->id . '-' . time();
+        $refCommand = 'SR-'.$serviceRequest->id.'-'.(string) \Illuminate\Support\Str::uuid();
 
         $result = $this->paytech->requestPayment([
-            'item_name'    => 'Service de vidange Videzma',
-            'item_price'   => (int) $serviceRequest->price_amount,
-            'ref_command'  => $refCommand,
-            'command_name' => 'Vidange - ' . $serviceRequest->address,
-            'ipn_url'      => url('/api/payments/ipn'),
-            'success_url'  => url('/payment/success?ref=' . $refCommand . '&type=service&id=' . $serviceRequest->id),
-            'cancel_url'   => url('/payment/cancel?ref=' . $refCommand . '&type=service&id=' . $serviceRequest->id),
+            'item_name' => 'Service de vidange Videzma',
+            'item_price' => (int) $serviceRequest->price_amount,
+            'ref_command' => $refCommand,
+            'command_name' => 'Vidange - '.$serviceRequest->address,
+            'ipn_url' => url('/api/payments/ipn'),
+            'success_url' => url('/payment/success?ref='.$refCommand.'&type=service&id='.$serviceRequest->id),
+            'cancel_url' => url('/payment/cancel?ref='.$refCommand.'&type=service&id='.$serviceRequest->id),
             'custom_field' => json_encode([
-                'type'               => 'service_request',
+                'type' => 'service_request',
                 'service_request_id' => $serviceRequest->id,
-                'ref_command'        => $refCommand,
+                'ref_command' => $refCommand,
             ]),
         ]);
 
@@ -58,12 +58,12 @@ class PaymentController extends Controller
 
         $serviceRequest->update([
             'payment_reference' => $refCommand,
-            'payment_token'     => $result['token'],
+            'payment_token' => $result['token'],
         ]);
 
         return response()->json([
             'redirect_url' => $result['redirect_url'],
-            'token'        => $result['token'],
+            'token' => $result['token'],
         ]);
     }
 
@@ -87,20 +87,20 @@ class PaymentController extends Controller
         }
 
         $subscription->load('plan');
-        $refCommand = 'SUB-' . $subscription->id . '-' . time();
+        $refCommand = 'SUB-'.$subscription->id.'-'.(string) \Illuminate\Support\Str::uuid();
 
         $result = $this->paytech->requestPayment([
-            'item_name'    => 'Forfait Videzma - ' . ($subscription->plan->name ?? 'Abonnement'),
-            'item_price'   => (int) $subscription->plan->price,
-            'ref_command'  => $refCommand,
-            'command_name' => 'Souscription forfait - ' . ($subscription->plan->name ?? ''),
-            'ipn_url'      => url('/api/payments/ipn'),
-            'success_url'  => url('/payment/success?ref=' . $refCommand . '&type=subscription&id=' . $subscription->id),
-            'cancel_url'   => url('/payment/cancel?ref=' . $refCommand . '&type=subscription&id=' . $subscription->id),
+            'item_name' => 'Forfait Videzma - '.($subscription->plan->name ?? 'Abonnement'),
+            'item_price' => (int) $subscription->price_amount,
+            'ref_command' => $refCommand,
+            'command_name' => 'Souscription forfait - '.($subscription->plan->name ?? ''),
+            'ipn_url' => url('/api/payments/ipn'),
+            'success_url' => url('/payment/success?ref='.$refCommand.'&type=subscription&id='.$subscription->id),
+            'cancel_url' => url('/payment/cancel?ref='.$refCommand.'&type=subscription&id='.$subscription->id),
             'custom_field' => json_encode([
-                'type'            => 'subscription',
+                'type' => 'subscription',
                 'subscription_id' => $subscription->id,
-                'ref_command'     => $refCommand,
+                'ref_command' => $refCommand,
             ]),
         ]);
 
@@ -112,12 +112,12 @@ class PaymentController extends Controller
 
         $subscription->update([
             'payment_reference' => $refCommand,
-            'payment_token'     => $result['token'],
+            'payment_token' => $result['token'],
         ]);
 
         return response()->json([
             'redirect_url' => $result['redirect_url'],
-            'token'        => $result['token'],
+            'token' => $result['token'],
         ]);
     }
 
@@ -127,54 +127,52 @@ class PaymentController extends Controller
      */
     public function ipn(Request $request)
     {
-        if (!$this->paytech->verifyIpn($request->all())) {
-            Log::warning('Paytech IPN: signature invalide', ['payload' => $request->all()]);
+        if (! $this->paytech->verifyIpn($request->all())) {
+            Log::warning('Paytech IPN: signature invalide');
 
             return response()->json(['message' => 'Signature invalide.'], 403);
         }
 
-        $typeEvent   = $request->input('type_event');
-        $customField = json_decode($request->input('custom_field', '{}'), true);
-        $type        = $customField['type'] ?? null;
-
-        Log::info('Paytech IPN reçu', ['type_event' => $typeEvent, 'custom_field' => $customField]);
-
-        if ($type === 'service_request') {
-            $serviceRequestId = $customField['service_request_id'] ?? null;
-            $serviceRequest   = $serviceRequestId ? ServiceRequest::find($serviceRequestId) : null;
-
-            if (!$serviceRequest) {
-                return response()->json(['message' => 'Demande introuvable.'], 404);
-            }
-
-            if ($typeEvent === 'sale_complete') {
-                $serviceRequest->update([
-                    'payment_status' => 'paid',
-                    'paid_at'        => now(),
-                ]);
-            } elseif ($typeEvent === 'sale_canceled') {
-                $serviceRequest->update(['payment_status' => 'failed']);
-            }
-        } elseif ($type === 'subscription') {
-            $subscriptionId = $customField['subscription_id'] ?? null;
-            $subscription   = $subscriptionId ? ClientSubscription::find($subscriptionId) : null;
-
-            if (!$subscription) {
-                return response()->json(['message' => 'Souscription introuvable.'], 404);
-            }
-
-            if ($typeEvent === 'sale_complete') {
-                $subscription->update([
-                    'payment_status' => 'paid',
-                    'paid_at'        => now(),
-                    'status'         => ClientSubscription::STATUS_ACTIVE,
-                ]);
-            } elseif ($typeEvent === 'sale_canceled') {
-                $subscription->update(['payment_status' => 'failed']);
-            }
+        $validated = $request->validate([
+            'type_event' => ['required', 'in:sale_complete,sale_canceled'],
+            'ref_command' => ['required', 'string'],
+            'custom_field' => ['required', 'json'],
+        ]);
+        $custom = json_decode($validated['custom_field'], true);
+        $model = match ($custom['type'] ?? null) {
+            'service_request' => ServiceRequest::class,
+            'subscription' => ClientSubscription::class,
+            default => null,
+        };
+        if (! $model) {
+            return response()->json(['message' => 'Type de paiement inconnu.'], 422);
+        }
+        $id = $model === ServiceRequest::class
+            ? ($custom['service_request_id'] ?? null)
+            : ($custom['subscription_id'] ?? null);
+        if (! is_scalar($id) || ! ctype_digit((string) $id) || (int) $id < 1) {
+            return response()->json(['message' => 'Identifiant de paiement invalide.'], 422);
         }
 
-        return response()->json(['message' => 'OK']);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($model, $id, $validated) {
+            $payment = $model::lockForUpdate()->findOrFail($id);
+            if (! $payment->payment_reference || ! hash_equals($payment->payment_reference, $validated['ref_command'])) {
+                return response()->json(['message' => 'Référence de paiement obsolète ou invalide.'], 409);
+            }
+            // Repeated or late cancellation notifications cannot undo a confirmed payment.
+            if ($payment->payment_status === 'paid') {
+                return response()->json(['message' => 'OK']);
+            }
+            if ($validated['type_event'] === 'sale_complete') {
+                $payment->payment_status = 'paid';
+                $payment->paid_at = now();
+            } else {
+                $payment->payment_status = 'failed';
+            }
+            $payment->save();
+
+            return response()->json(['message' => 'OK']);
+        });
     }
 
     /**
@@ -188,7 +186,7 @@ class PaymentController extends Controller
 
         return response()->json([
             'payment_status' => $serviceRequest->payment_status,
-            'paid_at'        => $serviceRequest->paid_at?->toIso8601String(),
+            'paid_at' => $serviceRequest->paid_at?->toIso8601String(),
         ]);
     }
 
@@ -203,7 +201,7 @@ class PaymentController extends Controller
 
         return response()->json([
             'payment_status' => $subscription->payment_status,
-            'paid_at'        => $subscription->paid_at?->toIso8601String(),
+            'paid_at' => $subscription->paid_at?->toIso8601String(),
         ]);
     }
 }

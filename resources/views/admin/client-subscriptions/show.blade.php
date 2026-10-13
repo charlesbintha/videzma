@@ -70,7 +70,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4 text-center border-end">
-                            <h3 class="text-primary">{{ $subscription->plan->formatted_price ?? 'N/A' }}</h3>
+                            <h3 class="text-primary">{{ $subscription->formatted_price ?? 'N/A' }}</h3>
                             <p class="text-muted">Prix du forfait</p>
                         </div>
                         <div class="col-md-4 text-center border-end">

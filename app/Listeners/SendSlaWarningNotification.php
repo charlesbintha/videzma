@@ -14,18 +14,18 @@ class SendSlaWarningNotification
 
     public function handle(SlaWarning $event): void
     {
-        $consultation = $event->consultation;
-        $doctor = $consultation->doctor;
+        $serviceRequest = $event->serviceRequest;
+        $driver = $serviceRequest->driver;
 
-        // Notify the assigned doctor
-        if ($doctor) {
+        // Notify the assigned driver
+        if ($driver) {
             $this->notificationService->send(
-                user: $doctor,
+                user: $driver,
                 title: 'Alerte SLA - Demande urgente',
-                body: "La demande #{$consultation->id} approche de l'echeance SLA ({$event->percentElapsed}% ecoule).",
+                body: "La demande #{$serviceRequest->id} approche de l'echeance SLA ({$event->percentElapsed}% ecoule).",
                 data: [
                     'type' => 'sla_warning',
-                    'consultation_id' => $consultation->id,
+                    'service_request_id' => $serviceRequest->id,
                     'percent_elapsed' => $event->percentElapsed,
                 ]
             );
@@ -37,10 +37,10 @@ class SendSlaWarningNotification
             $this->notificationService->send(
                 user: $admin,
                 title: 'Alerte SLA - Attention requise',
-                body: "La demande #{$consultation->id} approche de l'echeance ({$event->percentElapsed}%).",
+                body: "La demande #{$serviceRequest->id} approche de l'echeance ({$event->percentElapsed}%).",
                 data: [
                     'type' => 'sla_warning',
-                    'consultation_id' => $consultation->id,
+                    'service_request_id' => $serviceRequest->id,
                     'percent_elapsed' => $event->percentElapsed,
                 ]
             );

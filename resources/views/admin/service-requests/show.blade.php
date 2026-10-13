@@ -27,26 +27,31 @@
         </div>
     @endif
 
+    <section class="card"><div class="card-body"><h2 class="mb-3">Suivi de la demande</h2><div class="vz-timeline">
+        @foreach(['requested_at' => 'Demande reçue', 'assigned_at' => 'Vidangeur assigné', 'accepted_at' => 'Acceptée', 'started_at' => 'En cours', 'completed_at' => 'Terminée'] as $field => $label)
+            <div @class(['done' => $serviceRequest->$field])><strong>{{ $label }}</strong><small>{{ $serviceRequest->$field?->format('d/m à H:i') ?? 'À venir' }}</small></div>
+        @endforeach
+    </div></div></section>
     <div class="row">
         <div class="col-xl-8">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5>Details de la demande</h5>
+                    <h5>Détails de la demande</h5>
                     @switch($serviceRequest->status)
                         @case('pending')
                             <span class="badge bg-warning fs-6">En attente</span>
                             @break
                         @case('assigned')
-                            <span class="badge bg-info fs-6">Assigne</span>
+                            <span class="badge bg-info fs-6">Assigné</span>
                             @break
                         @case('accepted')
-                            <span class="badge bg-primary fs-6">Accepte</span>
+                            <span class="badge bg-primary fs-6">Accepté</span>
                             @break
                         @case('in_progress')
                             <span class="badge bg-secondary fs-6">En cours</span>
                             @break
                         @case('completed')
-                            <span class="badge bg-success fs-6">Termine</span>
+                            <span class="badge bg-success fs-6">Terminé</span>
                             @break
                         @default
                             <span class="badge bg-danger fs-6">{{ ucfirst($serviceRequest->status) }}</span>
@@ -247,7 +252,7 @@
                     @endif
                     @if($serviceRequest->payment_status !== 'paid')
                         <form action="{{ route('admin.service-requests.mark-paid', $serviceRequest) }}" method="POST"
-                              onsubmit="return confirm('Confirmer le paiement manuel de {{ number_format($serviceRequest->price_amount ?? 0, 0, \',\', \' \') }} FCFA ?')">
+                              onsubmit="return confirm('Confirmer la réception de ce paiement ?')">
                             @csrf
                             <button type="submit" class="btn btn-success w-100">
                                 <i class="fa fa-check me-1"></i> Marquer comme payé
@@ -260,7 +265,7 @@
             @if($serviceRequest->status === 'pending' || $serviceRequest->status === 'assigned')
             <div class="card">
                 <div class="card-header">
-                    <h5>Assigner un vidangeur</h5>
+                    <h5>Assignér un vidangeur</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.service-requests.assign', $serviceRequest) }}" method="POST">
@@ -268,7 +273,7 @@
                         <div class="mb-3">
                             <label class="form-label" for="driver_id">Vidangeur</label>
                             <select class="form-select" id="driver_id" name="driver_id" required>
-                                <option value="">Selectionner...</option>
+                                <option value="">Sélectionner...</option>
                                 @foreach($drivers as $driver)
                                     <option value="{{ $driver->id }}" @selected($serviceRequest->driver_id == $driver->id)>
                                         {{ $driver->name }}
@@ -277,7 +282,7 @@
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">
-                            <i class="fa fa-user-check me-1"></i> Assigner
+                            <i class="fa fa-user-check me-1"></i> Assignér
                         </button>
                     </form>
                 </div>
@@ -296,16 +301,16 @@
                             <label class="form-label" for="status">Statut</label>
                             <select class="form-select" id="status" name="status">
                                 <option value="pending" @selected($serviceRequest->status === 'pending')>En attente</option>
-                                <option value="assigned" @selected($serviceRequest->status === 'assigned')>Assigne</option>
-                                <option value="accepted" @selected($serviceRequest->status === 'accepted')>Accepte</option>
+                                <option value="assigned" @selected($serviceRequest->status === 'assigned')>Assigné</option>
+                                <option value="accepted" @selected($serviceRequest->status === 'accepted')>Accepté</option>
                                 <option value="in_progress" @selected($serviceRequest->status === 'in_progress')>En cours</option>
-                                <option value="completed" @selected($serviceRequest->status === 'completed')>Termine</option>
-                                <option value="cancelled" @selected($serviceRequest->status === 'cancelled')>Annule</option>
+                                <option value="completed" @selected($serviceRequest->status === 'completed')>Terminé</option>
+                                <option value="canceled" @selected($serviceRequest->status === 'canceled')>Annulé</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="admin_notes">Notes admin</label>
-                            <textarea class="form-control" id="admin_notes" name="admin_notes" rows="3">{{ old('admin_notes', $serviceRequest->admin_notes) }}</textarea>
+                            <textarea class="form-control" id="admin_notes" name="admin_notes" rows="3">{{ old('admin_notes', $serviceRequest->notes) }}</textarea>
                         </div>
                         <button type="submit" class="btn btn-secondary w-100">
                             <i class="fa fa-save me-1"></i> Mettre a jour

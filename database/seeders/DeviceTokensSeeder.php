@@ -15,7 +15,7 @@ class DeviceTokensSeeder extends Seeder
             return;
         }
 
-        $users = User::whereIn('role', ['patient', 'doctor'])->get();
+        $users = User::whereIn('role', ['client', 'driver'])->get();
         $platforms = ['ios', 'android'];
 
         foreach ($users->take(10) as $user) {

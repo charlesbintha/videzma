@@ -14,7 +14,7 @@ class NotificationsSeeder extends Seeder
             return;
         }
 
-        $users = User::whereIn('role', ['patient', 'doctor'])->get();
+        $users = User::whereIn('role', ['client', 'driver'])->get();
 
         if ($users->isEmpty()) {
             return;
@@ -22,10 +22,10 @@ class NotificationsSeeder extends Seeder
 
         $channels = ['email', 'push', 'sms'];
         $statuses = ['queued', 'sent', 'failed'];
-        $titles = ['Mise a jour du rendez-vous', 'Rappel de consultation', 'Compte verifie', 'Alerte SLA'];
+        $titles = ['Mise a jour du service', 'Rappel de intervention', 'Compte verifie', 'Alerte SLA'];
         $bodies = [
-            'Votre rendez-vous a ete mis a jour.',
-            'Un rappel a ete envoye pour votre consultation.',
+            'Votre service a ete mis a jour.',
+            'Un rappel a ete envoye pour votre intervention.',
             'Votre compte a ete verifie par l administration.',
             'Une demande approche de l echeance SLA.',
         ];

@@ -32,8 +32,8 @@
                 <div class="col-md-3">
                     <select class="form-select" name="role">
                         <option value="">Tous les roles</option>
-                        <option value="patient" @selected(request('role') === 'patient')>Patient</option>
-                        <option value="doctor" @selected(request('role') === 'doctor')>Medecin</option>
+                        <option value="client" @selected(request('role') === 'client')>Client</option>
+                        <option value="driver" @selected(request('role') === 'driver')>Vidangeur</option>
                         <option value="admin" @selected(request('role') === 'admin')>Admin</option>
                     </select>
                 </div>
@@ -49,7 +49,7 @@
                     <button class="btn btn-primary w-100" type="submit">OK</button>
                 </div>
             </form>
-            @php($roleLabels = ['patient' => 'Patient', 'doctor' => 'Medecin', 'admin' => 'Admin'])
+            @php($roleLabels = ['client' => 'Client', 'driver' => 'Vidangeur', 'admin' => 'Admin'])
             @php($statusLabels = ['pending' => 'En attente', 'active' => 'Actif', 'suspended' => 'Suspendu'])
             <div class="table-responsive">
                 <table class="table table-striped">

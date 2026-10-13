@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\ServiceRequest;
 use App\Models\Location;
+use App\Models\ServiceRequest;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -37,18 +37,20 @@ class ServiceRequestsSeeder extends Seeder
             $priceAmount = ServiceRequest::BASE_PRICE + ($estimatedVolume * ServiceRequest::PRICE_PER_M3);
 
             // Déterminer le statut
-            if (!$driver) {
+            if (! $driver) {
                 $status = 'pending';
             } else {
                 $status = fake()->randomElement(['assigned', 'accepted', 'rejected', 'in_progress', 'completed']);
             }
 
+            $location = Location::where('user_id', $client->id)->inRandomOrder()->first();
+
             $data = [
                 'client_id' => $client->id,
                 'driver_id' => $driver?->id,
-                'location_id' => Location::where('user_id', $client->id)->inRandomOrder()->value('id'),
+                'location_id' => $location?->id,
                 'status' => $status,
-                'address' => fake()->address(),
+                'address' => $location?->address ?? 'Démo — Dakar, adresse à préciser',
                 'fosse_type' => fake()->randomElement($fosseTypes),
                 'estimated_volume' => $estimatedVolume,
                 'urgency_level' => fake()->randomElement($urgencyLevels),

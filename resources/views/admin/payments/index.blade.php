@@ -3,6 +3,9 @@
 @section('title', 'Paiements')
 
 @section('main_content')
+@if(\App\Models\PaymentReceipt::where('source', 'legacy_estimate')->exists())
+<div class="alert alert-warning">Les montants d’anciens abonnements ont été reconstitués à partir des tarifs disponibles lors de la migration. Ils sont à rapprocher des justificatifs de paiement.</div>
+@endif
 <div class="container-fluid">
     <div class="page-title">
         <div class="row">
@@ -256,7 +259,7 @@
                             </td>
                             <td>{{ $sub->plan->name ?? '-' }}</td>
                             <td class="fw-bold text-primary text-nowrap">
-                                {{ number_format($sub->plan->price ?? 0, 0, ',', ' ') }} FCFA
+                                {{ number_format($sub->price_amount ?? 0, 0, ',', ' ') }} FCFA
                             </td>
                             <td>
                                 <span class="badge {{ $methodBadge[$sub->payment_method ?? ''] ?? 'bg-secondary' }}">
@@ -294,7 +297,7 @@
                             <td colspan="3" class="text-end">Total payé :</td>
                             <td class="text-success">
                                 {{ number_format(
-                                    $subscriptionPayments->where('payment_status', 'paid')->sum(fn($s) => $s->plan->price ?? 0),
+                                    $subscriptionPayments->where('payment_status', 'paid')->sum(fn($s) => $s->price_amount ?? 0),
                                     0, ',', ' '
                                 ) }} FCFA
                             </td>

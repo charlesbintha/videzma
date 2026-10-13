@@ -3,33 +3,34 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\ConsultationRequest;
 use App\Models\Location;
 use App\Models\NavigationSession;
+use App\Models\ServiceRequest;
 use App\Models\User;
 use App\Services\Maps\GoogleMapsDirections;
 use Illuminate\Http\Request;
 
 class RouteController extends Controller
 {
-    public function fastest(Request $request, User $patient, GoogleMapsDirections $maps)
+    public function fastest(Request $request, User $client, GoogleMapsDirections $maps)
     {
-        $doctor = $request->user();
+        $driver = $request->user();
 
-        if (!$doctor) {
+        if (! $driver) {
             abort(401, 'Acces refuse.');
         }
 
-        if (!in_array($doctor->role, ['doctor', 'admin'], true)) {
+        if (! in_array($driver->role, ['driver', 'admin'], true)) {
             abort(403, 'Acces refuse.');
         }
 
-        if ($doctor->role === 'doctor') {
-            $follows = ConsultationRequest::where('doctor_id', $doctor->id)
-                ->where('patient_id', $patient->id)
+        if ($driver->role === 'driver') {
+            $follows = ServiceRequest::where('driver_id', $driver->id)
+                ->where('client_id', $client->id)
+                ->whereIn('status', ['assigned', 'accepted', 'in_progress'])
                 ->exists();
 
-            if (!$follows) {
+            if (! $follows) {
                 abort(403, 'Acces refuse.');
             }
         }
@@ -37,21 +38,20 @@ class RouteController extends Controller
         $validated = $request->validate([
             'origin_latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'origin_longitude' => ['nullable', 'numeric', 'between:-180,180'],
-            'consultation_request_id' => ['nullable', 'exists:consultation_requests,id'],
+            'service_request_id' => ['nullable', 'exists:service_requests,id'],
         ]);
 
         $originLat = $validated['origin_latitude'] ?? null;
         $originLng = $validated['origin_longitude'] ?? null;
 
         if ($originLat === null || $originLng === null) {
-            $origin = Location::where('user_id', $doctor->id)
-                ->orderByDesc('captured_at')
-                ->orderByDesc('created_at')
+            $origin = Location::where('user_id', $driver->id)
+                ->newest()
                 ->first();
 
-            if (!$origin) {
+            if (! $origin || ! $origin->isFresh()) {
                 return response()->json([
-                    'message' => 'Position du medecin manquante.',
+                    'message' => 'Position du vidangeur manquante.',
                 ], 422);
             }
 
@@ -59,32 +59,37 @@ class RouteController extends Controller
             $originLng = (float) $origin->longitude;
         }
 
-        $destination = Location::where('user_id', $patient->id)
-            ->orderByDesc('captured_at')
-            ->orderByDesc('created_at')
-            ->first();
+        $serviceRequest = null;
 
-        if (!$destination) {
-            return response()->json([
-                'message' => 'Position du patient manquante.',
-            ], 404);
-        }
-
-        $consultation = null;
-
-        if (!empty($validated['consultation_request_id'])) {
-            $consultation = ConsultationRequest::whereKey($validated['consultation_request_id'])
-                ->where('patient_id', $patient->id)
-                ->when($doctor->role === 'doctor', function ($query) use ($doctor) {
-                    $query->where('doctor_id', $doctor->id);
+        if (! empty($validated['service_request_id'])) {
+            $serviceRequest = ServiceRequest::whereKey($validated['service_request_id'])
+                ->where('client_id', $client->id)
+                ->whereIn('status', ['assigned', 'accepted', 'in_progress'])
+                ->when($driver->role === 'driver', function ($query) use ($driver) {
+                    $query->where('driver_id', $driver->id);
                 })
                 ->first();
 
-            if (!$consultation) {
+            if (! $serviceRequest) {
                 return response()->json([
-                    'message' => 'Consultation invalide.',
+                    'message' => 'Demande invalide.',
                 ], 422);
             }
+        }
+
+        if (! $serviceRequest) {
+            $services = ServiceRequest::where('client_id', $client->id)
+                ->whereIn('status', ['assigned', 'accepted', 'in_progress'])
+                ->when($driver->role === 'driver', fn ($query) => $query->where('driver_id', $driver->id))
+                ->limit(2)->get();
+            if ($services->count() !== 1) {
+                return response()->json(['message' => 'Précisez la demande à rejoindre.'], 422);
+            }
+            $serviceRequest = $services->first();
+        }
+        $destination = $serviceRequest->location;
+        if (! $destination) {
+            return response()->json(['message' => 'Lieu de l’intervention manquant.'], 422);
         }
 
         $route = $maps->getFastestRoute(
@@ -94,15 +99,15 @@ class RouteController extends Controller
             (float) $destination->longitude
         );
 
-        if (!$route['ok']) {
+        if (! $route['ok']) {
             return response()->json([
                 'message' => $route['message'],
             ], 502);
         }
 
         $session = NavigationSession::create([
-            'doctor_id' => $doctor->id,
-            'consultation_request_id' => $consultation?->id,
+            'driver_id' => $driver->id,
+            'service_request_id' => $serviceRequest?->id,
             'status' => 'active',
             'started_at' => now(),
         ]);

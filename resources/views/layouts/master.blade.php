@@ -1,64 +1,32 @@
 <!DOCTYPE html>
-<html lang="en" @if (Route::currentRouteName() == 'rtl_layout') dir="rtl" @endif
-@if (Route::currentRouteName() === 'layout_dark') data-theme="dark" @endif>
-  <head>
+<html lang="fr">
+<head>
     @include('layouts.head')
-    @include('layouts.css')
-  </head>
-  @switch(Route::currentRouteName())
-   
-    @case('box_layout')
-        <body class="box-layout">
-        @break
-
-    @case('rtl_layout')
-        <body class="rtl">
-        @break
-
-    @case('layout_dark')
-        <body class="dark-only">
-        @break
-
-    @default
-         <body>
-  @endswitch
-    <!-- loader starts-->
-    <div class="loader-wrapper">
-      <div class="loader-index"> <span></span></div>
-      <svg>
-        <defs></defs>
-        <filter id="goo">
-          <fegaussianblur in="SourceGraphic" stddeviation="11" result="blur"></fegaussianblur>
-          <fecolormatrix in="blur" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo"> </fecolormatrix>
-        </filter>
-      </svg>
-    </div>
-    <!-- loader ends-->
-
-    <!-- tap on top starts-->
-    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
-    <!-- tap on tap ends-->
-
-     <!-- page-wrapper Start-->
-    <div class="page-wrapper compact-wrapper" id="pageWrapper">
-
-      <!-- Page header start -->
-      @include('layouts.header')
-      <!-- Page header end-->
-
-        <!-- Page Body Start-->
-        <div class="page-body-wrapper horizontal-menu">
-
-          <!-- Page sidebar start-->
-          @include('layouts.sidebar')
-
-          <div class="page-body">
+    <link rel="stylesheet" href="{{ asset('assets/css/vendors/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/fontawesome.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/videzma-admin.css').'?v='.filemtime(public_path('assets/css/videzma-admin.css')) }}">
+    @yield('css')
+    @stack('styles')
+</head>
+<body class="vz-app">
+    <a class="vz-skip" href="#main-content">Aller au contenu</a>
+    @include('layouts.sidebar')
+    <div class="vz-workspace">
+        @include('layouts.header')
+        <main id="main-content" tabindex="-1">
+            @if ($errors->any())
+                <div class="alert alert-danger" role="alert"><strong>Veuillez vérifier les informations.</strong><ul class="mb-0">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+            @endif
+            @if (session('error'))<div class="alert alert-danger" role="alert">{{ session('error') }}</div>@endif
             @yield('main_content')
-          </div>
-          
-          @include('layouts.footer')
-        </div>
+        </main>
+        <footer class="vz-footer"><span>© {{ date('Y') }} Videzma</span><span>La vidange, en toute simplicité.</span></footer>
     </div>
-    @include('layouts.scripts')
-  </body>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/icons/feather-icon/feather.min.js') }}"></script>
+    <script src="{{ asset('assets/js/videzma-admin.js') }}"></script>
+    @yield('scripts')
+    @stack('scripts')
+</body>
 </html>

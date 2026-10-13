@@ -4,9 +4,7 @@ namespace App\Events;
 
 use App\Models\Location;
 use App\Models\ServiceRequest;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -16,14 +14,26 @@ class DriverPositionUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public bool $afterCommit = true;
+
     public int $serviceRequestId;
+
     public int $driverId;
+
+    public int $locationId;
+
     public float $latitude;
+
     public float $longitude;
+
     public int $timestamp;
+
     public ?int $distanceMeters;
+
     public ?int $etaMinutes;
+
     public string $driverName;
+
     public ?string $driverPhone;
 
     /**
@@ -37,9 +47,10 @@ class DriverPositionUpdated implements ShouldBroadcast
     ) {
         $this->serviceRequestId = $serviceRequest->id;
         $this->driverId = $serviceRequest->driver_id;
+        $this->locationId = $location->id;
         $this->latitude = (float) $location->latitude;
         $this->longitude = (float) $location->longitude;
-        $this->timestamp = $location->captured_at->timestamp;
+        $this->timestamp = $location->recordedAt()?->timestamp ?? now()->timestamp;
         $this->distanceMeters = $distanceMeters;
         $this->etaMinutes = $etaMinutes;
 
@@ -55,8 +66,17 @@ class DriverPositionUpdated implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
+        // Recheck when the queued broadcast actually runs, after a possible stop or reassignment.
+        if (! ServiceRequest::trackingActive()->whereKey($this->serviceRequestId)
+            ->where('driver_id', $this->driverId)
+            ->where('navigation_started_at', '<=', date('Y-m-d H:i:s', $this->timestamp))->exists()
+            || $this->timestamp < now()->subMinutes(2)->timestamp
+            || Location::where('user_id', $this->driverId)->newest()->value('id') !== $this->locationId) {
+            return [];
+        }
+
         return [
-            new PrivateChannel('tracking.service.' . $this->serviceRequestId),
+            new PrivateChannel('tracking.service.'.$this->serviceRequestId),
         ];
     }
 
@@ -82,6 +102,8 @@ class DriverPositionUpdated implements ShouldBroadcast
             'timestamp' => $this->timestamp,
             'distance' => $this->distanceMeters,
             'eta' => $this->etaMinutes,
+            'is_fresh' => true,
+            'eta_source' => null,
             'driver' => [
                 'name' => $this->driverName,
                 'phone' => $this->driverPhone,

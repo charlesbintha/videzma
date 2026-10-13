@@ -7,10 +7,40 @@ use Illuminate\Database\Eloquent\Model;
 
 class ServiceRequest extends Model
 {
-    use HasFactory;
+    use \App\Models\Concerns\RecordsPayments, HasFactory;
+
+    public const STATUS_LABELS = ['pending' => 'En attente', 'assigned' => 'Assignée', 'accepted' => 'Acceptée', 'in_progress' => 'En cours', 'completed' => 'Terminée', 'rejected' => 'Refusée', 'canceled' => 'Annulée', 'cancelled' => 'Annulée'];
+
+    public const ACTIVE_STATUSES = ['pending', 'assigned', 'accepted', 'in_progress'];
+
+    public const TRACKING_STATUSES = ['accepted', 'in_progress'];
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $service) {
+            if ($service->navigation_started_at &&
+                (! in_array($service->status, self::TRACKING_STATUSES, true) ||
+                 ($service->exists && $service->isDirty('driver_id')))) {
+                $service->navigation_ended_at = $service->navigation_ended_at ?? now();
+            }
+        });
+    }
+
+    public function scopeTrackingActive($query)
+    {
+        return $query->whereIn('status', self::TRACKING_STATUSES)
+            ->whereNotNull('driver_id')->whereNotNull('navigation_started_at')->whereNull('navigation_ended_at');
+    }
+
+    public function isTrackingActive(): bool
+    {
+        return $this->driver_id !== null && in_array($this->status, self::TRACKING_STATUSES, true)
+            && $this->navigation_started_at !== null && $this->navigation_ended_at === null;
+    }
 
     // Prix de base en FCFA
     public const BASE_PRICE = 15000;
+
     // Prix par m³ supplémentaire
     public const PRICE_PER_M3 = 5000;
 
@@ -75,7 +105,7 @@ class ServiceRequest extends Model
 
     public function getFormattedPriceAttribute(): string
     {
-        return number_format($this->price_amount ?? 0, 0, ',', ' ') . ' FCFA';
+        return number_format($this->price_amount ?? 0, 0, ',', ' ').' FCFA';
     }
 
     public function client()

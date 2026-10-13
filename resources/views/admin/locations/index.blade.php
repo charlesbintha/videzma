@@ -1,239 +1,28 @@
 @extends('layouts.master')
-
-@section('title', 'Localisation')
-
-@section('css')
-    <style>
-        .videzma-map {
-            height: 520px;
-            border-radius: 12px;
-        }
-    </style>
-@endsection
-
+@section('title', 'Localisations')
 @section('main_content')
-    <div class="container-fluid">
-        <div class="page-title">
-            <div class="row">
-                <div class="col-sm-6">
-                    <h3>Localisation & navigation</h3>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">
-                                <svg class="stroke-icon">
-                                    <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
-                                </svg></a></li>
-                        <li class="breadcrumb-item active">Localisation</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
+<div class="container-fluid vz-locations">
+    <div class="vz-location-heading"><div><span class="vz-location-eyebrow">OPÉRATIONS SUR LE TERRAIN</span><h3>Localisations</h3><p>Les lieux d’intervention et le suivi de vos vidangeurs, sur une seule carte.</p></div><button class="btn btn-primary" id="refresh-locations" aria-label="Actualiser les positions" type="button"><i class="fa fa-refresh" aria-hidden="true"></i> Actualiser</button></div>
+    <div class="vz-location-stats"><div><strong id="mission-count">{{ $mapData['total'] }}</strong><span>Demandes actives</span></div><div><strong id="live-count">—</strong><span>Vidangeurs · GPS récent</span></div><div><strong id="missing-count">—</strong><span>Lieux à préciser</span></div></div>
+    <form class="vz-location-filters" method="GET" action="{{ route('admin.locations.index') }}">
+        <div><label for="location-search">Client ou adresse</label><input id="location-search" class="form-control" name="search" maxlength="100" value="{{ $search }}" placeholder="Rechercher une intervention…"></div>
+        <div><label for="location-driver">Vidangeur</label><select class="form-select" id="location-driver" name="driver_id"><option value="">Tous les vidangeurs</option>@foreach($drivers as $driver)<option value="{{ $driver->id }}" @selected((string)$selectedDriver === (string)$driver->id)>{{ $driver->name }}</option>@endforeach</select></div>
+        <button class="btn btn-primary" type="submit">Filtrer</button><a class="btn btn-light" href="{{ route('admin.locations.index') }}">Réinitialiser</a>
+    </form>
+    <div class="vz-location-workspace">
+        <section class="vz-location-map-panel" aria-label="Carte des interventions">
+            <div class="vz-location-map-toolbar"><span><i class="fa fa-map-marker" aria-hidden="true"></i> Vue terrain</span><button id="fit-locations" type="button" class="btn btn-light">Tout voir</button></div>
+            <div id="locations-map" class="vz-location-map"><p class="vz-map-placeholder">{{ $mapsKey ? 'Chargement de la carte…' : 'La carte est indisponible pour le moment. Vous pouvez consulter les interventions dans la liste.' }}</p></div>
+            <div class="vz-map-legend"><span><b class="vz-map-dot destination"></b> Lieu d’intervention</span><span><b class="vz-map-dot driver"></b> Vidangeur</span><span><b class="vz-map-dot stale"></b> Position ancienne</span></div>
+            <p id="map-notice" class="vz-location-notice" role="status">Sélectionnez une demande pour consulter son trajet.</p>
+        </section>
+        <section class="vz-location-list-panel" aria-label="Demandes actives"><div class="vz-location-list-heading"><h4>Interventions à suivre</h4><span id="sync-state" role="status">Mise à jour toutes les 15 s</span></div><div id="location-missions" class="vz-location-missions"></div></section>
     </div>
-
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-xl-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Clients suivis</h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="get" class="row g-2 align-items-end">
-                            <div class="col-12">
-                                <label class="form-label" for="driver_id">Filtrer par vidangeur</label>
-                                <select class="form-select" id="driver_id" name="driver_id">
-                                    <option value="">Tous les vidangeurs</option>
-                                    @foreach ($drivers ?? $doctors ?? [] as $driver)
-                                        <option value="{{ $driver->id }}" @selected((string) ($selectedDriver ?? $selectedDoctor ?? '') === (string) $driver->id)>
-                                            {{ $driver->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label" for="search">Recherche client</label>
-                                <input class="form-control" id="search" name="search" value="{{ $search }}" placeholder="Nom ou email">
-                            </div>
-                            <div class="col-12">
-                                <button class="btn btn-primary w-100" type="submit">Appliquer</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Dernieres positions</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-striped mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Client</th>
-                                        <th>Position</th>
-                                        <th>Capture</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($clients ?? $patients ?? [] as $client)
-                                        @php($location = $client->latestLocation)
-                                        <tr>
-                                            <td>
-                                                <div class="fw-semibold">{{ $client->name }}</div>
-                                                <small class="text-muted">{{ $client->email }}</small>
-                                            </td>
-                                            <td>
-                                                @if ($location)
-                                                    {{ $location->latitude }}, {{ $location->longitude }}
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if ($location)
-                                                    {{ ($location->captured_at ?? $location->created_at)?->format('Y-m-d H:i') }}
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="3" class="text-center">Aucun client.</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Carte</h5>
-                    </div>
-                    <div class="card-body">
-                        @if (!$mapsKey)
-                            <div class="alert alert-warning mb-0">
-                                Cle Google Maps manquante. Renseignez <code>GOOGLE_MAPS_API_KEY</code> dans le .env.
-                            </div>
-                        @else
-                            <div id="videzma-map" class="videzma-map"></div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <section id="location-detail" class="vz-location-detail" aria-label="Intervention sélectionnée" hidden></section>
+</div>
 @endsection
-
 @section('scripts')
-    @if ($mapsKey)
-        <script>
-            const videzmaClients = @json($mapClients ?? $mapPatients ?? []);
-            const videzmaDriver = @json($driverMap ?? $doctorMap ?? null);
-            const videzmaMapId = @json($mapId);
-
-            function escapeHtml(value) {
-                const div = document.createElement('div');
-                div.appendChild(document.createTextNode(value ?? ''));
-                return div.innerHTML;
-            }
-
-            window.initVidezmaMap = function () {
-                const hasMarkers = Boolean(videzmaDriver) || videzmaClients.length > 0;
-                const fallbackCenter = { lat: 14.6928, lng: -17.4467 }; // Dakar
-                const first = videzmaDriver || videzmaClients[0];
-                const center = first ? { lat: first.latitude, lng: first.longitude } : fallbackCenter;
-                const mapOptions = {
-                    center,
-                    zoom: hasMarkers ? 12 : 10,
-                };
-
-                if (videzmaMapId) {
-                    mapOptions.mapId = videzmaMapId;
-                }
-
-                const map = new google.maps.Map(document.getElementById('videzma-map'), mapOptions);
-
-                if (!hasMarkers) {
-                    return;
-                }
-
-                let directionsRenderer = null;
-                let directionsService = null;
-
-                if (videzmaDriver) {
-                    new google.maps.Marker({
-                        position: { lat: videzmaDriver.latitude, lng: videzmaDriver.longitude },
-                        map,
-                        title: videzmaDriver.name,
-                        label: 'V', // V for Vidangeur
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 12,
-                            fillColor: '#4CB050',
-                            fillOpacity: 1,
-                            strokeColor: '#fff',
-                            strokeWeight: 2,
-                        },
-                    });
-
-                    directionsRenderer = new google.maps.DirectionsRenderer({
-                        map,
-                        polylineOptions: {
-                            strokeColor: '#F15A22',
-                            strokeWeight: 4,
-                        },
-                    });
-                    directionsService = new google.maps.DirectionsService();
-                }
-
-                videzmaClients.forEach((client) => {
-                    const marker = new google.maps.Marker({
-                        position: { lat: client.latitude, lng: client.longitude },
-                        map,
-                        title: client.name,
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 8,
-                            fillColor: '#F15A22',
-                            fillOpacity: 1,
-                            strokeColor: '#fff',
-                            strokeWeight: 2,
-                        },
-                    });
-
-                    const info = new google.maps.InfoWindow({
-                        content: `<strong>${escapeHtml(client.name)}</strong><br>${escapeHtml(client.address || '')}<br>${escapeHtml(client.captured_at || '')}`,
-                    });
-
-                    marker.addListener('click', () => {
-                        info.open(map, marker);
-
-                        if (videzmaDriver && directionsService && directionsRenderer) {
-                            directionsService.route({
-                                origin: { lat: videzmaDriver.latitude, lng: videzmaDriver.longitude },
-                                destination: { lat: client.latitude, lng: client.longitude },
-                                travelMode: google.maps.TravelMode.DRIVING,
-                                drivingOptions: {
-                                    departureTime: new Date(),
-                                    trafficModel: 'bestguess',
-                                },
-                            }, (result, status) => {
-                                if (status === 'OK') {
-                                    directionsRenderer.setDirections(result);
-                                }
-                            });
-                        }
-                    });
-                });
-            };
-        </script>
-        <script src="https://maps.googleapis.com/maps/api/js?key={{ $mapsKey }}&callback=initVidezmaMap&loading=async{{ $mapId ? '&map_ids=' . $mapId : '' }}" async defer></script>
-    @endif
+<script id="locations-config" type="application/json">{!! json_encode(['data' => $mapData, 'endpoint' => route('admin.locations.data', request()->only('driver_id','search')), 'hasMap' => (bool)$mapsKey], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
+<script src="{{ asset('assets/js/videzma-locations.js') }}?v={{ filemtime(public_path('assets/js/videzma-locations.js')) }}"></script>
+@if($mapsKey)<script async src="https://maps.googleapis.com/maps/api/js?key={{ $mapsKey }}&amp;callback=initLocationsMap&amp;loading=async" onerror="locationsMapFailed()"></script>@endif
 @endsection

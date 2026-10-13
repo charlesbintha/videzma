@@ -14,18 +14,18 @@ class SendSlaBreachNotification
 
     public function handle(SlaBreach $event): void
     {
-        $consultation = $event->consultation;
-        $doctor = $consultation->doctor;
+        $serviceRequest = $event->serviceRequest;
+        $driver = $serviceRequest->driver;
 
-        // Notify the assigned doctor
-        if ($doctor) {
+        // Notify the assigned driver
+        if ($driver) {
             $this->notificationService->send(
-                user: $doctor,
+                user: $driver,
                 title: 'SLA depasse - Action immediate requise',
-                body: "La demande #{$consultation->id} a depasse l'echeance SLA.",
+                body: "La demande #{$serviceRequest->id} a depasse l'echeance SLA.",
                 data: [
                     'type' => 'sla_breach',
-                    'consultation_id' => $consultation->id,
+                    'service_request_id' => $serviceRequest->id,
                 ]
             );
         }
@@ -35,11 +35,11 @@ class SendSlaBreachNotification
         foreach ($admins as $admin) {
             $this->notificationService->send(
                 user: $admin,
-                title: 'SLA depasse - Demande expiree',
-                body: "La demande #{$consultation->id} a depasse l'echeance SLA et a ete marquee comme expiree.",
+                title: 'SLA depasse - Demande en retard',
+                body: "La demande #{$serviceRequest->id} a depasse l'echeance SLA et nécessite une prise en charge.",
                 data: [
                     'type' => 'sla_breach',
-                    'consultation_id' => $consultation->id,
+                    'service_request_id' => $serviceRequest->id,
                 ]
             );
         }

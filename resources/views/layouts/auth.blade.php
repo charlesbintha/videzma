@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
+<html lang="fr">
+<head>
     @include('layouts.head')
-    @include('layouts.css')
-  </head>
-  <body>
-    <div class="container-fluid p-0">
-      @yield('content')
-    </div>
-    @include('layouts.scripts')
-  </body>
+    <link rel="stylesheet" href="{{ asset('assets/css/vendors/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/videzma-admin.css').'?v='.filemtime(public_path('assets/css/videzma-admin.css')) }}">
+    @yield('css')
+</head>
+<body class="vz-app">
+    @yield('content')
+</body>
 </html>

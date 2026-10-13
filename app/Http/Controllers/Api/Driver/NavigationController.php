@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api\Driver;
 
 use App\Http\Controllers\Controller;
-use App\Models\ServiceRequest;
 use App\Models\Location;
+use App\Models\ServiceRequest;
 use App\Services\Maps\GoogleMapsDirections;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class NavigationController extends Controller
 {
@@ -35,7 +35,7 @@ class NavigationController extends Controller
         // Get client's location from the service request
         $clientLocation = $serviceRequest->location;
 
-        if (!$clientLocation) {
+        if (! $clientLocation) {
             return response()->json([
                 'success' => false,
                 'message' => 'Localisation du client non disponible',
@@ -50,25 +50,27 @@ class NavigationController extends Controller
             (float) $clientLocation->longitude
         );
 
-        if (!$route['ok']) {
+        if (! $route['ok']) {
             return response()->json([
                 'success' => false,
                 'message' => $route['message'] ?? 'Erreur calcul itineraire',
             ], 500);
         }
 
-        // Store driver's current position
-        Location::create([
-            'user_id' => $driver->id,
-            'latitude' => $request->origin_latitude,
-            'longitude' => $request->origin_longitude,
-            'captured_at' => now(),
-        ]);
+        // A mission can end while the external route calculation is in progress.
+        $serviceRequest = \Illuminate\Support\Facades\DB::transaction(function () use ($serviceRequest, $driver, $request) {
+            \App\Models\User::whereKey($driver->id)->lockForUpdate()->firstOrFail();
+            $current = ServiceRequest::whereKey($serviceRequest->id)->where('driver_id', $driver->id)
+                ->whereIn('status', ServiceRequest::TRACKING_STATUSES)->lockForUpdate()->first();
+            abort_unless($current, 409, 'Cette mission ne peut plus être suivie.');
+            $current->update(['navigation_started_at' => now(), 'navigation_ended_at' => null]);
+            app(\App\Services\LocationRecorder::class)->record($driver, [
+                'latitude' => $request->origin_latitude, 'longitude' => $request->origin_longitude,
+                'captured_at' => now(),
+            ], $current);
 
-        // Mark service request as in_navigation
-        $serviceRequest->update([
-            'navigation_started_at' => now(),
-        ]);
+            return $current;
+        });
 
         $distanceMeters = ($route['distance_km'] ?? 0) * 1000;
         $etaMinutes = $route['eta_minutes'] ?? 0;
@@ -90,6 +92,7 @@ class NavigationController extends Controller
                 ],
                 'distance_meters' => (int) $distanceMeters,
                 'eta_minutes' => $etaMinutes,
+                'eta_source' => 'road_route',
                 'formatted_distance' => $this->formatDistance($distanceMeters),
                 'formatted_eta' => $this->formatDuration($etaMinutes),
                 'polyline' => $route['route_data']['routes'][0]['overview_polyline']['points'] ?? null,
@@ -109,26 +112,27 @@ class NavigationController extends Controller
             'longitude' => 'required|numeric|between:-180,180',
             'speed' => 'nullable|numeric|min:0',
             'heading' => 'nullable|numeric|min:0|max:360',
+            'captured_at' => 'nullable|date',
         ]);
 
         $driver = $request->user();
         $serviceRequest = ServiceRequest::where('id', $request->service_request_id)
             ->where('driver_id', $driver->id)
-            ->whereNotNull('navigation_started_at')
+            ->trackingActive()
             ->firstOrFail();
 
         // Store new position
-        Location::create([
+        app(\App\Services\LocationRecorder::class)->record($driver, [
             'user_id' => $driver->id,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
-            'captured_at' => now(),
-        ]);
+            'captured_at' => $request->input('captured_at', now()),
+        ], $serviceRequest);
 
         // Get client's location
         $clientLocation = $serviceRequest->location;
 
-        if (!$clientLocation) {
+        if (! $clientLocation) {
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -145,18 +149,16 @@ class NavigationController extends Controller
             $clientLocation->longitude
         );
 
-        // Estimate remaining time (assuming average speed of 30 km/h in city)
-        $avgSpeed = $request->speed && $request->speed > 0 ? $request->speed : 30;
-        $etaMinutes = ($distance / 1000) / $avgSpeed * 60;
-
         return response()->json([
             'success' => true,
             'data' => [
                 'position_updated' => true,
                 'distance_to_client' => round($distance),
-                'eta_minutes' => round($etaMinutes),
+                'eta_minutes' => null,
+                'eta_source' => null,
                 'formatted_distance' => $this->formatDistance($distance),
-                'formatted_eta' => $this->formatDuration($etaMinutes),
+                'formatted_eta' => null,
+                'distance_source' => 'straight_line',
             ],
         ]);
     }
@@ -170,18 +172,19 @@ class NavigationController extends Controller
             'service_request_id' => 'required|integer|exists:service_requests,id',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
+            'captured_at' => 'nullable|date',
         ]);
 
         $driver = $request->user();
         $serviceRequest = ServiceRequest::where('id', $request->service_request_id)
             ->where('driver_id', $driver->id)
-            ->whereNotNull('navigation_started_at')
+            ->trackingActive()
             ->firstOrFail();
 
         // Get client's location
         $clientLocation = $serviceRequest->location;
 
-        if (!$clientLocation) {
+        if (! $clientLocation) {
             return response()->json([
                 'success' => false,
                 'message' => 'Localisation du client non disponible',
@@ -196,7 +199,7 @@ class NavigationController extends Controller
             (float) $clientLocation->longitude
         );
 
-        if (!$route['ok']) {
+        if (! $route['ok']) {
             return response()->json([
                 'success' => false,
                 'message' => $route['message'] ?? 'Erreur calcul itineraire',
@@ -204,12 +207,12 @@ class NavigationController extends Controller
         }
 
         // Update driver's position
-        Location::create([
+        app(\App\Services\LocationRecorder::class)->record($driver, [
             'user_id' => $driver->id,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
-            'captured_at' => now(),
-        ]);
+            'captured_at' => $request->input('captured_at', now()),
+        ], $serviceRequest);
 
         $distanceMeters = ($route['distance_km'] ?? 0) * 1000;
         $etaMinutes = $route['eta_minutes'] ?? 0;
@@ -220,6 +223,7 @@ class NavigationController extends Controller
                 'session_id' => $serviceRequest->id,
                 'distance_meters' => (int) $distanceMeters,
                 'eta_minutes' => $etaMinutes,
+                'eta_source' => 'road_route',
                 'formatted_distance' => $this->formatDistance($distanceMeters),
                 'formatted_eta' => $this->formatDuration($etaMinutes),
                 'polyline' => $route['route_data']['routes'][0]['overview_polyline']['points'] ?? null,
@@ -240,7 +244,7 @@ class NavigationController extends Controller
         $driver = $request->user();
         $serviceRequest = ServiceRequest::where('id', $request->service_request_id)
             ->where('driver_id', $driver->id)
-            ->whereNotNull('navigation_started_at')
+            ->trackingActive()
             ->firstOrFail();
 
         $serviceRequest->update([
@@ -261,15 +265,14 @@ class NavigationController extends Controller
         $user = request()->user();
         $serviceRequest = ServiceRequest::where('id', $serviceRequestId)
             ->where('client_id', $user->id)
-            ->whereNotNull('navigation_started_at')
-            ->whereNull('navigation_ended_at')
+            ->trackingActive()
             ->firstOrFail();
 
         $driverLocation = Location::where('user_id', $serviceRequest->driver_id)
-            ->latest('captured_at')
+            ->sinceNavigation($serviceRequest)->newest()
             ->first();
 
-        if (!$driverLocation) {
+        if (! $driverLocation) {
             return response()->json([
                 'success' => false,
                 'message' => 'Position du vidangeur non disponible',
@@ -280,7 +283,6 @@ class NavigationController extends Controller
         $clientLocation = $serviceRequest->location;
 
         $distance = null;
-        $eta = null;
 
         if ($clientLocation) {
             $distance = $this->calculateDistance(
@@ -289,7 +291,6 @@ class NavigationController extends Controller
                 $clientLocation->latitude,
                 $clientLocation->longitude
             );
-            $eta = round(($distance / 1000) / 30 * 60); // Assuming 30 km/h
         }
 
         return response()->json([
@@ -302,12 +303,14 @@ class NavigationController extends Controller
                 'position' => [
                     'latitude' => $driverLocation->latitude,
                     'longitude' => $driverLocation->longitude,
-                    'captured_at' => $driverLocation->captured_at->toIso8601String(),
+                    'captured_at' => $driverLocation->recordedAt()?->toIso8601String(),
                 ],
-                'distance_meters' => $distance ? round($distance) : null,
-                'eta_minutes' => $eta,
-                'formatted_distance' => $distance ? $this->formatDistance($distance) : null,
-                'formatted_eta' => $eta ? $this->formatDuration($eta) : null,
+                'distance_meters' => $distance !== null ? round($distance) : null,
+                'eta_minutes' => null,
+                'is_fresh' => $driverLocation->isFresh(),
+                'distance_source' => 'straight_line',
+                'formatted_distance' => $distance !== null ? $this->formatDistance($distance) : null,
+                'formatted_eta' => null,
             ],
         ]);
     }
@@ -332,18 +335,20 @@ class NavigationController extends Controller
     private function formatDistance(float $meters): string
     {
         if ($meters < 1000) {
-            return round($meters) . ' m';
+            return round($meters).' m';
         }
-        return number_format($meters / 1000, 1) . ' km';
+
+        return number_format($meters / 1000, 1).' km';
     }
 
     private function formatDuration(float $minutes): string
     {
         if ($minutes < 60) {
-            return round($minutes) . ' min';
+            return round($minutes).' min';
         }
         $hours = floor($minutes / 60);
         $mins = round($minutes % 60);
-        return $hours . ' h ' . $mins . ' min';
+
+        return $hours.' h '.$mins.' min';
     }
 }

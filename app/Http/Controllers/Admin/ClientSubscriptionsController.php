@@ -88,7 +88,7 @@ class ClientSubscriptionsController extends Controller
 
         return redirect()
             ->route('admin.client-subscriptions.index')
-            ->with('success', 'Abonnement cree avec succes pour ' . $subscription->client->name);
+            ->with('success', 'Abonnement cree avec succes pour '.$subscription->client->name);
     }
 
     public function show(ClientSubscription $clientSubscription)
@@ -121,6 +121,10 @@ class ClientSubscriptionsController extends Controller
             'auto_renew' => ['boolean'],
         ]);
 
+        if ((int) $validated['plan_id'] !== $clientSubscription->plan_id) {
+            return back()->withErrors(['plan_id' => 'Créez un nouvel abonnement pour changer de forfait et conserver l’historique.']);
+        }
+
         $validated['auto_renew'] = $request->boolean('auto_renew', false);
 
         if ($validated['payment_status'] === 'paid' && $clientSubscription->payment_status !== 'paid') {
@@ -149,7 +153,7 @@ class ClientSubscriptionsController extends Controller
 
         return redirect()
             ->route('admin.client-subscriptions.index')
-            ->with('success', 'Abonnement de ' . $clientName . ' supprime.');
+            ->with('success', 'Abonnement de '.$clientName.' supprime.');
     }
 
     public function pause(ClientSubscription $clientSubscription)
@@ -184,11 +188,14 @@ class ClientSubscriptionsController extends Controller
     {
         $clientSubscription->renew();
 
-        return back()->with('success', 'Abonnement renouvele. Nouvelle periode jusqu\'au ' . $clientSubscription->current_period_end->format('d/m/Y'));
+        return back()->with('success', 'Abonnement renouvele. Nouvelle periode jusqu\'au '.$clientSubscription->current_period_end->format('d/m/Y'));
     }
 
     public function markPaid(ClientSubscription $clientSubscription)
     {
+        if ($clientSubscription->payment_status === 'paid') {
+            return back()->with('success', 'Ce paiement est déjà confirmé.');
+        }
         $clientSubscription->update([
             'payment_status' => 'paid',
             'paid_at' => now(),

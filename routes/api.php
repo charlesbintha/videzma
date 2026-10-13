@@ -1,24 +1,24 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\LocationController;
-use App\Http\Controllers\Api\ServiceRequestsController;
-use App\Http\Controllers\Api\NotificationsController;
-use App\Http\Controllers\Api\RouteController;
-use App\Http\Controllers\Api\DriversController;
-use App\Http\Controllers\Api\Driver\ServiceRequestsController as DriverServiceRequestsController;
-use App\Http\Controllers\Api\Driver\CommentsController as DriverCommentsController;
-use App\Http\Controllers\Api\Driver\AvailabilityController as DriverAvailabilityController;
-use App\Http\Controllers\Api\Driver\ProfileController as DriverProfileController;
-use App\Http\Controllers\Api\Driver\NavigationController as DriverNavigationController;
-use App\Http\Controllers\Api\TrackingController;
-use App\Http\Controllers\Api\SubscriptionsController;
 use App\Http\Controllers\Api\BroadcastAuthController;
+use App\Http\Controllers\Api\Driver\AvailabilityController as DriverAvailabilityController;
+use App\Http\Controllers\Api\Driver\CommentsController as DriverCommentsController;
+use App\Http\Controllers\Api\Driver\NavigationController as DriverNavigationController;
+use App\Http\Controllers\Api\Driver\ProfileController as DriverProfileController;
+use App\Http\Controllers\Api\Driver\ServiceRequestsController as DriverServiceRequestsController;
+use App\Http\Controllers\Api\DriversController;
+use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\NotificationsController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\RouteController;
+use App\Http\Controllers\Api\ServiceRequestsController;
+use App\Http\Controllers\Api\SubscriptionsController;
+use App\Http\Controllers\Api\TrackingController;
+use Illuminate\Support\Facades\Route;
 
-Route::post('auth/login', [AuthController::class, 'login']);
-Route::post('auth/register', [AuthController::class, 'register']);
+Route::post('auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+Route::post('auth/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 
 // IPN Paytech — route publique (appelée par les serveurs Paytech)
 Route::post('payments/ipn', [PaymentController::class, 'ipn']);

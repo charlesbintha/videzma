@@ -5,7 +5,9 @@
 nul
 favicon.png
 map.jpeg
-/mobile
+.DS_Store
+.phpunit.result.cache
+/storage/app/private/
 *.txt
 /.claude
 /storage/*.key

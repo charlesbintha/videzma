@@ -136,7 +136,7 @@
                                 <td>
                                     <span class="badge bg-info">{{ $sub->plan->name ?? 'N/A' }}</span>
                                     <br>
-                                    <small>{{ $sub->plan->formatted_price ?? '' }}</small>
+                                    <small>{{ $sub->formatted_price ?? '' }}</small>
                                 </td>
                                 <td>
                                     {{ $sub->current_period_start?->format('d/m/Y') }} - {{ $sub->current_period_end?->format('d/m/Y') }}

@@ -1,157 +1,32 @@
- <!-- Page Sidebar Start-->
- <div class="sidebar-wrapper" data-sidebar-layout="stroke-svg">
-     <div>
-        <div class="logo-wrapper"><a href="{{ route('admin.dashboard') }}"><img class="img-fluid for-light"
-                    src="{{ asset('assets/images/logo/videzma.png') }}" alt="Videzma"><img class="img-fluid for-dark"
-                    src="{{ asset('assets/images/logo/videzma.png') }}" alt="Videzma"></a>
-             <div class="back-btn"><i class="fa-solid fa-angle-left"></i></div>
-             <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="grid"> </i></div>
-         </div>
-        <div class="logo-icon-wrapper"><a href="{{ route('admin.dashboard') }}"><img class="img-fluid"
-                    src="{{ asset('assets/images/logo/videzma-icon.png') }}" alt="Videzma"></a></div>
-         <nav class="sidebar-main">
-             <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
-             <div id="sidebar-menu">
-                 <ul class="sidebar-links" id="simple-bar">
-                     <li class="back-btn">
-                         <div class="mobile-back text-end"><span>Retour</span><i class="fa-solid fa-angle-right ps-2"
-                                 aria-hidden="true"></i></div>
-                     </li>
-                     <li class="sidebar-main-title">
-                         <div>
-                             <h6>Administration</h6>
-                         </div>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.dashboard') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-home') }}"></use>
-                             </svg><span>Tableau de bord</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.users.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-user') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-user') }}"></use>
-                             </svg><span>Utilisateurs</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-main-title">
-                         <div>
-                             <h6>Gestion des Services</h6>
-                         </div>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.drivers.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-contact') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-contact') }}"></use>
-                             </svg><span>Vidangeurs</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.driver-documents.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-file') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-file') }}"></use>
-                             </svg><span>Documents vidangeurs</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.service-requests.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-calendar') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-calender') }}"></use>
-                             </svg><span>Demandes de service</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.interventions.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-task') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-task') }}"></use>
-                             </svg><span>Interventions</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-main-title">
-                         <div>
-                             <h6>Abonnements</h6>
-                         </div>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.subscription-plans.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-form') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-form') }}"></use>
-                             </svg><span>Forfaits</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.client-subscriptions.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-editors') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-editors') }}"></use>
-                             </svg><span>Abonnements clients</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.payments.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-ecommerce') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-ecommerce') }}"></use>
-                             </svg><span>Paiements</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-main-title">
-                         <div>
-                             <h6>Outils</h6>
-                         </div>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.locations.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-maps') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-maps') }}"></use>
-                             </svg><span>Localisations</span>
-                         </a>
-                     </li>
-                     <li class="sidebar-list">
-                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.notifications.index') }}">
-                             <svg class="stroke-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-email') }}"></use>
-                             </svg>
-                             <svg class="fill-icon">
-                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-email') }}"></use>
-                             </svg><span>Notifications</span>
-                         </a>
-                     </li>
-
-                 </ul>
-             </div>
-             <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
-         </nav>
-     </div>
- </div>
- <!-- Page Sidebar Ends-->
+<aside class="vz-sidebar" id="navigation" aria-label="Navigation principale">
+    <a class="vz-brand" href="{{ route('admin.dashboard') }}">
+        <span class="vz-brand-icon"><i data-feather="droplet" aria-hidden="true"></i></span>
+        <span>videzma<span class="vz-brand-caption">ESPACE ADMINISTRATION</span></span>
+    </a>
+    @php
+        $groups = [
+            'Vue d’ensemble' => [ ['admin.dashboard', 'grid', 'Tableau de bord'], ],
+            'Opérations' => [ ['admin.service-requests.index', 'inbox', 'Demandes de service'], ['admin.interventions.index', 'calendar', 'Interventions'], ['admin.locations.index', 'map-pin', 'Localisations'], ],
+            'Réseau' => [ ['admin.users.index', 'users', 'Utilisateurs'], ['admin.drivers.index', 'truck', 'Vidangeurs'], ['admin.driver-documents.index', 'file-text', 'Documents vidangeurs'], ],
+            'Finances' => [ ['admin.payments.index', 'credit-card', 'Paiements'], ['admin.client-subscriptions.index', 'repeat', 'Abonnements clients'], ['admin.subscription-plans.index', 'package', 'Forfaits'], ],
+        ];
+    @endphp
+    <button type="button" class="vz-icon-button vz-mobile-close" aria-label="Fermer la navigation"><i data-feather="x" aria-hidden="true"></i></button>
+    <nav>
+        @foreach($groups as $title => $links)
+            <p class="vz-nav-heading">{{ $title }}</p>
+            @foreach($links as [$route, $icon, $label])
+                @php($active = $route === 'admin.dashboard' ? request()->routeIs($route) : request()->routeIs(str_replace('.index', '.*', $route)))
+                <a class="vz-nav-link {{ $active ? 'is-active' : '' }}" href="{{ route($route) }}" @if($active) aria-current="page" @endif>
+                    <i data-feather="{{ $icon }}" aria-hidden="true"></i><span>{{ $label }}</span>
+                </a>
+            @endforeach
+        @endforeach
+    </nav>
+    <div class="vz-sidebar-bottom">
+        <a class="vz-nav-link {{ request()->routeIs('admin.notifications.*') ? 'is-active' : '' }}" href="{{ route('admin.notifications.index') }}"><i data-feather="bell" aria-hidden="true"></i>Notifications</a>
+        <form method="post" action="{{ route('logout') }}">@csrf<button class="vz-nav-link" type="submit"><i data-feather="log-out" aria-hidden="true"></i>Déconnexion</button></form>
+        <div class="vz-sidebar-note"><span class="vz-dot"></span> Votre espace de pilotage</div>
+    </div>
+</aside>
+<button class="vz-backdrop" aria-label="Fermer la navigation" tabindex="-1"></button>

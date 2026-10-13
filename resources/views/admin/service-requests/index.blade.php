@@ -20,6 +20,11 @@
 </div>
 
 <div class="container-fluid">
+    <nav class="vz-request-tabs" aria-label="Filtrer les demandes">
+        @foreach(['' => 'Toutes les demandes', 'pending' => 'En attente', 'assigned' => 'Assignées', 'in_progress' => 'En cours', 'completed' => 'Terminées'] as $value => $label)
+            <a href="{{ route('admin.service-requests.index', array_merge(request()->except('page'), ['status' => $value])) }}" @class(['active' => request('status', '') === $value])>{{ $label }}</a>
+        @endforeach
+    </nav>
     <div class="card">
         <div class="card-header">
             <h5>Liste des demandes</h5>
@@ -27,18 +32,18 @@
         <div class="card-body">
             <form method="get" class="row g-3 mb-4">
                 <div class="col-md-3">
-                    <input type="text" name="search" class="form-control" placeholder="Adresse ou client..." value="{{ request('search') }}">
+                    <input type="text" aria-label="Adresse ou client" name="search" class="form-control" placeholder="Adresse ou client..." value="{{ request('search') }}">
                 </div>
                 <div class="col-md-2">
-                    <select name="status" class="form-select">
+                    <select aria-label="Statut de la demande" name="status" class="form-select">
                         <option value="">Tous les statuts</option>
                         @foreach ($statuses as $status)
-                            <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
+                            <option value="{{ $status }}" @selected(request('status') === $status)>{{ \App\Models\ServiceRequest::STATUS_LABELS[$status] ?? $status }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <select name="driver_id" class="form-select">
+                    <select aria-label="Vidangeur" name="driver_id" class="form-select">
                         <option value="">Tous les vidangeurs</option>
                         @foreach ($drivers as $driver)
                             <option value="{{ $driver->id }}" @selected(request('driver_id') == $driver->id)>{{ $driver->name }}</option>
@@ -46,7 +51,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <select name="payment_status" class="form-select">
+                    <select aria-label="Statut du paiement" name="payment_status" class="form-select">
                         <option value="">Tout paiement</option>
                         @foreach ($paymentStatuses as $val => $label)
                             <option value="{{ $val }}" @selected(request('payment_status') === $val)>{{ $label }}</option>
@@ -88,29 +93,7 @@
                                 <td>{{ Str::limit($request->address, 30) }}</td>
                                 <td>{{ $request->driver->name ?? '-' }}</td>
                                 <td>
-                                    @switch($request->status)
-                                        @case('pending')
-                                            <span class="badge bg-warning">En attente</span>
-                                            @break
-                                        @case('assigned')
-                                            <span class="badge bg-info">Assigne</span>
-                                            @break
-                                        @case('accepted')
-                                            <span class="badge bg-primary">Accepte</span>
-                                            @break
-                                        @case('in_progress')
-                                            <span class="badge bg-secondary">En cours</span>
-                                            @break
-                                        @case('completed')
-                                            <span class="badge bg-success">Termine</span>
-                                            @break
-                                        @case('rejected')
-                                        @case('cancelled')
-                                            <span class="badge bg-danger">{{ ucfirst($request->status) }}</span>
-                                            @break
-                                        @default
-                                            <span class="badge bg-secondary">{{ $request->status }}</span>
-                                    @endswitch
+                                    <span class="vz-status {{ $request->status }}">{{ \App\Models\ServiceRequest::STATUS_LABELS[$request->status] ?? $request->status }}</span>
                                 </td>
                                 <td>
                                     @if($request->payment_status === 'paid')
@@ -128,7 +111,7 @@
                                 <td class="text-nowrap">{{ number_format($request->price_amount ?? 0, 0, ',', ' ') }} F</td>
                                 <td>{{ $request->requested_at?->format('d/m/Y H:i') ?? '-' }}</td>
                                 <td>
-                                    <a href="{{ route('admin.service-requests.show', $request) }}" class="btn btn-sm btn-info">
+                                    <a href="{{ route('admin.service-requests.show', $request) }}" class="btn btn-sm btn-outline-secondary" aria-label="Voir la demande {{ $request->id }}">
                                         <i class="fa fa-eye"></i>
                                     </a>
                                 </td>

@@ -5,23 +5,23 @@ namespace App\Console\Commands;
 use App\Events\SlaBreach;
 use App\Events\SlaWarning;
 use App\Models\AuditAction;
-use App\Models\ConsultationRequest;
+use App\Models\ServiceRequest;
 use App\Models\SlaConfig;
 use Illuminate\Console\Command;
-use Illuminate\Support\Carbon;
 
 class RunSla extends Command
 {
     protected $signature = 'sla:run';
 
-    protected $description = 'Apply SLA rules to consultation requests';
+    protected $description = 'Apply SLA rules to service requests';
 
     public function handle(): int
     {
         $config = SlaConfig::where('is_active', true)->orderByDesc('created_at')->first();
 
-        if (!$config) {
+        if (! $config) {
             $this->info('No active SLA config found.');
+
             return self::SUCCESS;
         }
 
@@ -32,13 +32,13 @@ class RunSla extends Command
         $expiredCount = 0;
         $warningCount = 0;
 
-        $candidates = ConsultationRequest::whereIn('status', ['pending', 'assigned'])->get();
+        $candidates = ServiceRequest::whereIn('status', ['pending', 'assigned'])->get();
 
-        foreach ($candidates as $consultation) {
-            $dueAt = $consultation->sla_due_at;
-            $requestedAt = Carbon::parse($consultation->requested_at);
+        foreach ($candidates as $serviceRequest) {
+            $dueAt = $serviceRequest->sla_due_at;
+            $requestedAt = $serviceRequest->requested_at ?? $serviceRequest->created_at;
 
-            if (!$dueAt) {
+            if (! $dueAt) {
                 $dueAt = $requestedAt->copy()->addMinutes($expirationMinutes);
             }
 
@@ -47,22 +47,20 @@ class RunSla extends Command
             $percentElapsed = $totalMinutes > 0 ? ($elapsedMinutes / $totalMinutes) * 100 : 100;
 
             // Check for SLA breach (100% elapsed)
-            if ($dueAt->lte($now)) {
+            if ($dueAt->lte($now) && ! $serviceRequest->sla_breach_sent_at) {
                 // Only dispatch breach event if not already sent
-                if (!$consultation->sla_breach_sent_at) {
-                    event(new SlaBreach($consultation));
-                    $consultation->sla_breach_sent_at = $now;
+                if (! $serviceRequest->sla_breach_sent_at) {
+                    event(new SlaBreach($serviceRequest));
+                    $serviceRequest->sla_breach_sent_at = $now;
                 }
 
-                $consultation->status = 'expired';
-                $consultation->closed_at = $consultation->closed_at ?? $now;
-                $consultation->save();
+                $serviceRequest->save();
 
                 AuditAction::create([
                     'actor_id' => null,
-                    'action' => 'sla_expired',
-                    'target_type' => ConsultationRequest::class,
-                    'target_id' => $consultation->id,
+                    'action' => 'sla_breach',
+                    'target_type' => ServiceRequest::class,
+                    'target_id' => $serviceRequest->id,
                     'metadata' => ['due_at' => $dueAt->toDateTimeString()],
                     'ip_address' => null,
                 ]);
@@ -70,10 +68,10 @@ class RunSla extends Command
                 $expiredCount++;
             }
             // Check for SLA warning (75% elapsed)
-            elseif ($percentElapsed >= $warningThreshold && !$consultation->sla_warning_sent_at) {
-                event(new SlaWarning($consultation, (int) $percentElapsed));
+            elseif ($dueAt->gt($now) && $percentElapsed >= $warningThreshold && ! $serviceRequest->sla_warning_sent_at) {
+                event(new SlaWarning($serviceRequest, (int) $percentElapsed));
 
-                $consultation->update([
+                $serviceRequest->update([
                     'sla_warning_sent_at' => $now,
                 ]);
 
@@ -81,7 +79,7 @@ class RunSla extends Command
             }
         }
 
-        $this->info("Expired {$expiredCount} request(s).");
+        $this->info("Overdue {$expiredCount} request(s).");
         $this->info("Sent {$warningCount} warning(s).");
 
         return self::SUCCESS;

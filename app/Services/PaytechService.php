@@ -8,14 +8,16 @@ use Illuminate\Support\Facades\Log;
 class PaytechService
 {
     protected string $apiKey;
+
     protected string $apiSecret;
+
     protected string $env;
 
     public function __construct()
     {
-        $this->apiKey    = config('services.paytech.api_key');
-        $this->apiSecret = config('services.paytech.api_secret');
-        $this->env       = config('services.paytech.env', 'test');
+        $this->apiKey = (string) config('services.paytech.api_key', '');
+        $this->apiSecret = (string) config('services.paytech.api_secret', '');
+        $this->env = config('services.paytech.env', 'test');
     }
 
     /**
@@ -37,12 +39,12 @@ class PaytechService
     {
         $payload = array_merge($params, [
             'currency' => 'XOF',
-            'env'      => $this->env,
+            'env' => $this->env,
         ]);
 
         try {
             $response = Http::withHeaders([
-                'API_KEY'    => $this->apiKey,
+                'API_KEY' => $this->apiKey,
                 'API_SECRET' => $this->apiSecret,
             ])->post('https://paytech.sn/api/payment/request-payment', $payload);
 
@@ -60,10 +62,12 @@ class PaytechService
      */
     public function verifyIpn(array $data): bool
     {
-        $expectedKeyHash    = hash('sha256', $this->apiKey);
+        $expectedKeyHash = hash('sha256', $this->apiKey);
         $expectedSecretHash = hash('sha256', $this->apiSecret);
 
-        return isset($data['api_key_sha256'], $data['api_secret_sha256'])
+        return $this->apiKey !== '' && $this->apiSecret !== ''
+            && isset($data['api_key_sha256'], $data['api_secret_sha256'])
+            && is_string($data['api_key_sha256']) && is_string($data['api_secret_sha256'])
             && hash_equals($expectedKeyHash, $data['api_key_sha256'])
             && hash_equals($expectedSecretHash, $data['api_secret_sha256']);
     }

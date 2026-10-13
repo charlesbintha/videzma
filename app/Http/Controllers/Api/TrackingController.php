@@ -25,12 +25,11 @@ class TrackingController extends Controller
         // Find active navigation for this client
         $serviceRequest = ServiceRequest::where('id', $serviceRequestId)
             ->where('client_id', $user->id)
-            ->whereNotNull('navigation_started_at')
-            ->whereNull('navigation_ended_at')
+            ->trackingActive()
             ->first();
 
         // No active navigation
-        if (!$serviceRequest) {
+        if (! $serviceRequest) {
             return response()->json([
                 'tracking' => false,
                 'message' => 'Aucune navigation active',
@@ -39,10 +38,10 @@ class TrackingController extends Controller
 
         // Get driver's latest position
         $driverLocation = Location::where('user_id', $serviceRequest->driver_id)
-            ->latest('captured_at')
+            ->sinceNavigation($serviceRequest)->newest()
             ->first();
 
-        if (!$driverLocation) {
+        if (! $driverLocation) {
             return response()->json([
                 'tracking' => true,
                 'position' => null,
@@ -51,11 +50,11 @@ class TrackingController extends Controller
         }
 
         // Calculate ETag based on position and timestamp
-        $etag = '"' . md5(
-            $driverLocation->latitude .
-            $driverLocation->longitude .
-            $driverLocation->captured_at->timestamp
-        ) . '"';
+        $etag = '"'.md5(
+            $driverLocation->latitude.
+            $driverLocation->longitude.(int) $driverLocation->isFresh().
+            $driverLocation->recordedAt()?->timestamp
+        ).'"';
 
         // Check If-None-Match header for conditional request
         $clientEtag = $request->header('If-None-Match');
@@ -68,7 +67,6 @@ class TrackingController extends Controller
         // Calculate distance and ETA
         $clientLocation = $serviceRequest->location;
         $distance = null;
-        $eta = null;
 
         if ($clientLocation) {
             $distance = $this->calculateDistance(
@@ -77,8 +75,6 @@ class TrackingController extends Controller
                 $clientLocation->latitude,
                 $clientLocation->longitude
             );
-            // Assume average city speed of 30 km/h
-            $eta = (int) round(($distance / 1000) / 30 * 60);
         }
 
         // Minimal response with short keys for bandwidth efficiency
@@ -87,10 +83,14 @@ class TrackingController extends Controller
             'p' => [
                 'lat' => round((float) $driverLocation->latitude, 6),
                 'lng' => round((float) $driverLocation->longitude, 6),
-                't' => $driverLocation->captured_at->timestamp,
+                't' => $driverLocation->recordedAt()?->timestamp,
             ],
-            'd' => $distance ? (int) round($distance) : null,
-            'eta' => $eta,
+            'd' => $distance !== null ? (int) round($distance) : null,
+            'eta' => null,
+            'eta_source' => null,
+            'distance_source' => 'straight_line',
+            'is_fresh' => $driverLocation->isFresh(),
+            'stale_after_seconds' => 120,
             'driver' => [
                 'name' => $serviceRequest->driver->name ?? 'Vidangeur',
                 'phone' => $serviceRequest->driver->phone ?? null,
@@ -111,15 +111,14 @@ class TrackingController extends Controller
             ->where('client_id', $user->id)
             ->first();
 
-        if (!$serviceRequest) {
+        if (! $serviceRequest) {
             return response()->json([
                 'available' => false,
                 'reason' => 'not_found',
             ], 404);
         }
 
-        $isActive = $serviceRequest->navigation_started_at !== null
-            && $serviceRequest->navigation_ended_at === null;
+        $isActive = $serviceRequest->isTrackingActive();
 
         return response()->json([
             'available' => $isActive,

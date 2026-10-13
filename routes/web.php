@@ -1,37 +1,22 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\ClientSubscriptionsController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\DriversController;
 use App\Http\Controllers\Admin\DriverDocumentsController;
+use App\Http\Controllers\Admin\DriversController;
 use App\Http\Controllers\Admin\InterventionsController;
 use App\Http\Controllers\Admin\LocationsController;
 use App\Http\Controllers\Admin\NotificationsController;
-use App\Http\Controllers\Admin\ServiceRequestsController;
-use App\Http\Controllers\Admin\UsersController;
-use App\Http\Controllers\Admin\SubscriptionPlansController;
-use App\Http\Controllers\Admin\ClientSubscriptionsController;
 use App\Http\Controllers\Admin\PaymentsController;
+use App\Http\Controllers\Admin\ServiceRequestsController;
+use App\Http\Controllers\Admin\SubscriptionPlansController;
+use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Auth\LoginController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::view('layout-light', 'starter_kit.color_version.layout_light')->name('layout_light');
-Route::view('layout-dark', 'starter_kit.color_version.layout_dark')->name('layout_dark');
-
-// starter kit->page layout
-Route::view('box-layout', 'starter_kit.page_layout.box_layout')->name('box_layout');
-Route::view('rtl-layout', 'starter_kit.page_layout.rtl_layout')->name('rtl_layout');
-
-// hide menu on scroll
-Route::view('hide-menu-on-scroll', 'starter_kit.hide_menu_on_scroll')->name('hide_menu_on_scroll');
-
-// footers
-Route::view('footer-light', 'starter_kit.footers.footer_light')->name('footer_light');
-Route::view('footer-dark', 'starter_kit.footers.footer_dark')->name('footer_dark');
-Route::view('footer-fixed', 'starter_kit.footers.footer_fixed')->name('footer_fixed');
 
 // Pages de retour Paytech (interceptées par le WebView Flutter)
 Route::get('/payment/success', function () {
@@ -43,7 +28,7 @@ Route::get('/payment/cancel', function () {
 })->name('payment.cancel');
 
 Route::get('login', [LoginController::class, 'show'])->name('login');
-Route::post('login', [LoginController::class, 'authenticate'])->name('login.submit');
+Route::post('login', [LoginController::class, 'authenticate'])->middleware('throttle:5,1')->name('login.submit');
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
@@ -82,6 +67,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::patch('interventions/{intervention}', [InterventionsController::class, 'update'])->name('interventions.update');
 
     // Locations
+    Route::get('locations/data', [LocationsController::class, 'data'])->name('locations.data');
     Route::get('locations', [LocationsController::class, 'index'])->name('locations.index');
 
     // Notifications

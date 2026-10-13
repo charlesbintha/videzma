@@ -4,20 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
 
 class ClientSubscription extends Model
 {
-    use HasFactory;
+    use \App\Models\Concerns\RecordsPayments, HasFactory;
 
     public const STATUS_ACTIVE = 'active';
+
     public const STATUS_PAUSED = 'paused';
+
     public const STATUS_CANCELLED = 'cancelled';
+
     public const STATUS_EXPIRED = 'expired';
 
     protected $fillable = [
         'client_id',
         'plan_id',
+        'price_amount',
+        'payment_cycle',
         'status',
         'current_period_start',
         'current_period_end',
@@ -34,6 +38,7 @@ class ClientSubscription extends Model
     ];
 
     protected $casts = [
+        'price_amount' => 'integer',
         'current_period_start' => 'date',
         'current_period_end' => 'date',
         'interventions_used' => 'integer',
@@ -43,6 +48,19 @@ class ClientSubscription extends Model
         'cancelled_at' => 'datetime',
         'paused_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $subscription) {
+            $subscription->payment_cycle ??= (string) \Illuminate\Support\Str::uuid();
+            $subscription->price_amount ??= SubscriptionPlan::findOrFail($subscription->plan_id)->price;
+        });
+    }
+
+    public function getFormattedPriceAttribute(): string
+    {
+        return number_format($this->price_amount ?? 0, 0, ',', ' ').' FCFA';
+    }
 
     public function client()
     {
@@ -68,6 +86,7 @@ class ClientSubscription extends Model
     public function getRemainingInterventionsAttribute(): int
     {
         $max = $this->plan?->interventions_per_period ?? 0;
+
         return max(0, $max - $this->interventions_used);
     }
 
@@ -76,6 +95,7 @@ class ClientSubscription extends Model
         if ($this->current_period_end < now()) {
             return 0;
         }
+
         return now()->diffInDays($this->current_period_end);
     }
 
@@ -100,6 +120,11 @@ class ClientSubscription extends Model
             'volume_used' => 0,
             'status' => self::STATUS_ACTIVE,
             'payment_status' => 'pending',
+            'price_amount' => $this->plan->price,
+            'payment_cycle' => (string) \Illuminate\Support\Str::uuid(),
+            'paid_at' => null,
+            'payment_reference' => null,
+            'payment_token' => null,
         ]);
     }
 

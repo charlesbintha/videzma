@@ -43,11 +43,7 @@ class LoginController extends Controller
                 return redirect()->intended(route('admin.dashboard'));
             }
 
-            if ($user->role === 'doctor') {
-                return redirect()->intended(route('doctor.dashboard'));
-            }
-
-            // Patients and other roles cannot access web interface
+            // Les clients et vidangeurs utilisent l’application mobile.
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
