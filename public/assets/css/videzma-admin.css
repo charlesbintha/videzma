@@ -141,7 +141,7 @@ p {
     display: inline-block;
     background: #dbeafe;
     color: #1d4ed8;
-    font-size: 9px;
+    font-size: 13px;
     border-radius: 4px;
     padding: 1px 5px;
     margin-left: 8px;
@@ -170,7 +170,7 @@ p {
 
 .btn {
     border-radius: 7px;
-    font-size: 12px;
+    font-size: 14px;
     padding: 9px 14px;
     font-weight: 500;
     display: inline-flex;
@@ -214,7 +214,7 @@ p {
 
 .btn-sm {
     padding: 6px 10px;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .vz-metric:hover {
@@ -266,7 +266,7 @@ p {
     background: #f7f8f5;
     border: 1px solid #f0f1ed;
     border-radius: 6px;
-    font-size: 10px;
+    font-size: 13px;
     white-space: nowrap;
 }
 
@@ -303,7 +303,7 @@ p {
 }
 
 .vz-text-link {
-    font-size: 10px;
+    font-size: 13px;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -317,7 +317,7 @@ p {
 }
 
 .table {
-    font-size: 12px;
+    font-size: 14px;
     margin: 0;
     color: var(--vz-ink);
 }
@@ -426,7 +426,7 @@ p {
 }
 
 .vz-schedule-item time {
-    font-size: 10px;
+    font-size: 13px;
     color: #1d4ed8;
     border-radius: 5px;
     background: #eff6ff;
@@ -439,7 +439,7 @@ p {
 }
 
 .vz-schedule .btn {
-    font-size: 10px;
+    font-size: 13px;
     margin-top: 10px;
 }
 
@@ -452,7 +452,7 @@ p {
     gap: 10px;
     color: #8b9381;
     padding: 35px 15px;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .vz-empty strong {
@@ -471,7 +471,7 @@ p {
 }
 
 .vz-attention>span:last-child {
-    font-size: 10px;
+    font-size: 13px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -494,7 +494,7 @@ p {
 .breadcrumb {
     justify-content: flex-end;
     margin: 4px 0 0;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .container-fluid {
@@ -502,14 +502,14 @@ p {
 }
 
 .form-control {
-    font-size: 12px;
+    font-size: 14px;
     border-color: #e3e7dc;
     border-radius: 7px;
     min-height: 39px;
 }
 
 .form-select {
-    font-size: 12px;
+    font-size: 14px;
     border-color: #e3e7dc;
     border-radius: 7px;
     min-height: 39px;
@@ -526,7 +526,7 @@ p {
 }
 
 .form-label {
-    font-size: 11px;
+    font-size: 13px;
     color: #647057;
     font-weight: 500;
 }
@@ -545,7 +545,7 @@ p {
 
 .badge {
     font-weight: 500;
-    font-size: 10px;
+    font-size: 13px;
     border-radius: 5px;
     padding: 6px 8px;
 }
@@ -576,7 +576,7 @@ p {
 }
 
 .alert {
-    font-size: 12px;
+    font-size: 14px;
     border-radius: 8px;
 }
 
@@ -622,7 +622,7 @@ p {
     border: 1px solid var(--vz-line);
     background: white;
     border-radius: 7px;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .vz-request-tabs a.active {
@@ -644,7 +644,7 @@ p {
     border-top: 2px solid #e9ece4;
     padding-top: 10px;
     color: #949c88;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .vz-timeline>div.done {
@@ -658,7 +658,7 @@ p {
 
 .vz-timeline small {
     display: block;
-    font-size: 10px;
+    font-size: 13px;
     margin-top: 5px;
     color: #939a8a;
 }
@@ -674,7 +674,7 @@ p {
 
 .vz-soft-tag {
     display: inline-block;
-    font-size: 9px;
+    font-size: 13px;
     border: 1px solid #ecefe7;
     color: #68725f;
     padding: 4px 7px;
@@ -693,7 +693,7 @@ body.vz-app {
     background: #eaf1fc;
     color: #172554;
     font-family: var(--bs-body-font-family);
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.55;
     padding: 22px;
 }
@@ -712,7 +712,7 @@ body.vz-app {
 }
 
 .vz-sidebar {
-    width: 190px;
+    width: 240px;
     position: fixed;
     inset: 22px auto 22px 22px;
     padding: 22px 13px 14px;
@@ -747,14 +747,14 @@ body.vz-app {
 
 .vz-brand-caption {
     display: block;
-    font-size: 6px;
+    font-size: 13px;
     color: var(--vz-muted);
     letter-spacing: 1px;
     font-weight: 500;
 }
 
 .vz-nav-heading {
-    font-size: 9px;
+    font-size: 13px;
     color: #78787d;
     margin: 18px 9px 6px;
 }
@@ -767,7 +767,7 @@ body.vz-app {
     padding: 9px;
     margin: 3px 0;
     border-radius: 7px;
-    font-size: 10px;
+    font-size: 13px;
     color: #606066;
     transition: background .18s,color .18s;
     width: 100%;
@@ -799,7 +799,7 @@ body.vz-app {
 
 .vz-sidebar-note {
     padding: 18px 10px 0;
-    font-size: 8px;
+    font-size: 13px;
     color: #7b8175;
     border-top: 1px solid var(--vz-line);
     margin-top: 16px;
@@ -810,7 +810,7 @@ body.vz-app {
 }
 
 .vz-workspace {
-    margin-left: 190px;
+    margin-left: 240px;
     background: #fff;
     border-radius: 0 16px 16px 0;
     min-height: calc(100vh - 44px);
@@ -831,14 +831,14 @@ body.vz-app {
 }
 
 .vz-eyebrow {
-    font-size: 9px;
+    font-size: 13px;
     letter-spacing: .025em;
     color: #78787e;
     margin: 0;
 }
 
 .vz-greeting {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     margin-top: 3px;
 }
@@ -865,7 +865,7 @@ body.vz-app {
     background: transparent;
     width: 165px;
     outline: none;
-    font-size: 10px;
+    font-size: 13px;
 }
 
 .vz-avatar {
@@ -875,7 +875,7 @@ body.vz-app {
     place-items: center;
     background: #dbeafe;
     border-radius: 50%;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     color: #1d4ed8;
 }
@@ -901,7 +901,7 @@ main {
 }
 
 .vz-dashboard-title > span {
-    font-size: 10px;
+    font-size: 13px;
     color: #77777d;
 }
 
@@ -932,7 +932,7 @@ h2 {
     color: #172554;
     letter-spacing: -.025em;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 14px;
     margin: 0;
 }
 
@@ -978,7 +978,7 @@ h2 {
 
 .vz-operation-card p {
     color: #79797d;
-    font-size: 9px;
+    font-size: 13px;
     margin: 15px 0 3px;
 }
 
@@ -997,7 +997,7 @@ h2 {
 .vz-operation-actions .btn {
     flex: 1;
     padding: 6px 8px;
-    font-size: 10px;
+    font-size: 13px;
 }
 
 .vz-operation-actions .vz-icon-button {
@@ -1024,7 +1024,7 @@ h2 {
 
 .vz-activity-facts span {
     display: block;
-    font-size: 9px;
+    font-size: 13px;
     color: #77777d;
 }
 
@@ -1059,7 +1059,7 @@ h2 {
 
 .vz-revenue-total .vz-soft-tag {
     margin-left: 7px;
-    font-size: 8px;
+    font-size: 13px;
 }
 
 .vz-chart {
@@ -1075,7 +1075,7 @@ h2 {
 }
 
 .vz-chart figcaption {
-    font-size: 8px;
+    font-size: 13px;
     color: #68725f;
     margin: 13px 4px 0;
     margin-top: 5px;
@@ -1105,7 +1105,7 @@ h2 {
     border: 1px solid #f0f1ec;
     border-radius: 8px;
     padding: 12px 2px 9px;
-    font-size: 8px;
+    font-size: 13px;
     transition: background .18s;
     border-color: #f0f0f2;
 }
@@ -1121,7 +1121,7 @@ h2 {
 }
 
 .vz-subtle {
-    font-size: 9px;
+    font-size: 13px;
     color: #737378;
 }
 
@@ -1134,7 +1134,7 @@ h2 {
 }
 
 .table thead th {
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 500;
     color: #737379;
     background: #fcfcfd;
@@ -1142,14 +1142,14 @@ h2 {
 }
 
 .vz-person strong {
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 500;
     display: block;
 }
 
 .vz-person small {
     display: block;
-    font-size: 9px;
+    font-size: 13px;
     color: #737379;
     margin-top: 2px;
 }
@@ -1159,11 +1159,11 @@ h2 {
     height: 28px;
     background: #e0f2fe;
     flex-shrink: 0;
-    font-size: 10px;
+    font-size: 13px;
 }
 
 .vz-recent .table {
-    font-size: 10px;
+    font-size: 13px;
 }
 
 .vz-status {
@@ -1173,7 +1173,7 @@ h2 {
     border-radius: 5px;
     padding: 4px 7px;
     white-space: nowrap;
-    font-size: 8px;
+    font-size: 13px;
     background: #f1f2ee;
     color: #65705b;
 }
@@ -1208,7 +1208,7 @@ h2 {
 
 .vz-distribution-total > span:last-child {
     display: block;
-    font-size: 9px;
+    font-size: 13px;
     color: #77777c;
     letter-spacing: 0;
     margin-top: 2px;
@@ -1243,7 +1243,7 @@ h2 {
 
 .vz-gauge span {
     display: block;
-    font-size: 9px;
+    font-size: 13px;
     color: #76767b;
     margin-top: 4px;
 }
@@ -1263,7 +1263,7 @@ h2 {
     justify-content: space-between;
     align-items: center;
     margin-top: 12px;
-    font-size: 9px;
+    font-size: 13px;
     color: #737379;
     margin: 0;
 }
@@ -1291,13 +1291,13 @@ h2 {
 
 .vz-schedule-item strong {
     display: block;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 500;
 }
 
 .vz-schedule-item small {
     display: block;
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 400;
     color: #737379;
 }
@@ -1327,7 +1327,7 @@ h2 {
 }
 
 .vz-attention strong {
-    font-size: 11px;
+    font-size: 13px;
     display: block;
     margin-bottom: 7px;
     color: #172554;
@@ -1336,7 +1336,7 @@ h2 {
 }
 
 .vz-attention p {
-    font-size: 10px;
+    font-size: 13px;
     line-height: 1.7;
     color: #475569;
     clear: both;
@@ -1349,7 +1349,7 @@ h2 {
     justify-content: space-between;
     gap: 15px;
     color: #76767c;
-    font-size: 9px;
+    font-size: 13px;
 }
 
 .vz-login {
@@ -1390,7 +1390,7 @@ h2 {
 
 .vz-login-story p {
     color: #737378;
-    font-size: 12px;
+    font-size: 14px;
     max-width: 290px;
     line-height: 1.8;
 }
@@ -1432,7 +1432,7 @@ h2 {
 .vz-login-visual > span {
     display: block;
     color: #77777d;
-    font-size: 10px;
+    font-size: 13px;
 }
 
 .vz-login-visual strong {
@@ -1453,7 +1453,7 @@ h2 {
     border-radius: 5px;
     background: #dbeafe;
     color: #1d4ed8;
-    font-size: 9px;
+    font-size: 13px;
     text-align: center;
 }
 
@@ -1491,7 +1491,7 @@ h2 {
     }
     .vz-sidebar {
         inset: 12px auto 12px 12px;
-        width: 215px;
+        width: 240px;
         border-radius: 12px;
     }
     .vz-workspace {
@@ -1503,10 +1503,10 @@ h2 {
         border-radius: 12px 12px 0 0;
     }
     .vz-nav-link {
-        font-size: 12px;
+        font-size: 14px;
     }
     .vz-nav-heading {
-        font-size: 10px;
+        font-size: 13px;
     }
     .vz-login-story {
         padding: 30px;
@@ -1550,7 +1550,7 @@ h2 {
         margin-top: 10px;
     }
     .vz-activity-facts span {
-        font-size: 10px;
+        font-size: 13px;
     }
     .vz-revenue-total .vz-soft-tag {
         display: inline-block;
@@ -1560,10 +1560,10 @@ h2 {
         margin-top: 15px;
     }
     .vz-shortcut-grid a {
-        font-size: 10px;
+        font-size: 13px;
     }
     .vz-status-list li {
-        font-size: 11px;
+        font-size: 13px;
     }
     .vz-login {
         display: block;
@@ -1618,19 +1618,34 @@ button.vz-menu-toggle, button.vz-mobile-close {
 
 /* Field operations: fixed intervention sites and active GPS sessions. */
 .vz-location-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}
-.vz-location-eyebrow{font-size:10px;letter-spacing:1.6px;font-weight:600;color:var(--vz-primary)}
-.vz-location-heading h3{margin:8px 0;font-size:28px}.vz-location-heading p,.vz-location-detail p{color:#64748b;margin:4px 0}
+.vz-location-eyebrow{font-size: 13px;letter-spacing:1.6px;font-weight:600;color:var(--vz-primary)}
+.vz-location-heading h3{margin:8px 0;font-size: 28px}.vz-location-heading p,.vz-location-detail p{color:#64748b;margin:4px 0}
 .vz-location-stats{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border:1px solid #e2e8f0;border-radius:20px;margin-bottom:24px;padding:24px}
 .vz-location-stats>div{display:flex;align-items:center;gap:16px;padding:0 24px;border-right:1px solid #e2e8f0}.vz-location-stats>div:first-child{padding-left:0}.vz-location-stats>div:last-child{border:0}
-.vz-location-stats strong{font-size:28px;color:#1d4ed8;font-weight:600}.vz-location-stats span{color:#64748b;font-size:12px}
-.vz-location-filters{display:flex;align-items:end;gap:12px;margin-bottom:24px}.vz-location-filters>div:first-child{flex:1}.vz-location-filters>div:nth-child(2){flex:0 1 240px}.vz-location-filters label{font-size:12px;margin-bottom:8px;display:block}.vz-locations .btn,.vz-location-filters input,.vz-location-filters select{min-height:44px}
+.vz-location-stats strong{font-size: 28px;color:#1d4ed8;font-weight:600}.vz-location-stats span{color:#64748b;font-size: 14px}
+.vz-location-filters{display:flex;align-items:end;gap:12px;margin-bottom:24px}.vz-location-filters>div:first-child{flex:1}.vz-location-filters>div:nth-child(2){flex:0 1 240px}.vz-location-filters label{font-size: 14px;margin-bottom:8px;display:block}.vz-locations .btn,.vz-location-filters input,.vz-location-filters select{min-height:44px}
 .vz-location-workspace{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}.vz-location-map-panel,.vz-location-list-panel{background:#fff;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;min-width:0}
 .vz-location-map-toolbar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;font-weight:600}.vz-location-map-toolbar i{color:#2563eb;margin-right:8px}
 .vz-location-map{height:480px;background:#eff6ff}.vz-map-placeholder{padding:48px;text-align:center;color:#475569}
-.vz-map-legend{display:flex;flex-wrap:wrap;gap:12px;padding:16px 20px 8px;font-size:11px;color:#475569}.vz-map-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}.vz-map-dot.destination{background:#2563eb}.vz-map-dot.driver{background:#0891b2}.vz-map-dot.stale{background:#64748b}
-.vz-location-notice{font-size:12px;color:#64748b;padding:4px 20px 16px;margin:0;min-height:52px}
-.vz-location-list-heading{padding:20px;border-bottom:1px solid #e2e8f0}.vz-location-list-heading h4{font-size:16px;margin:0 0 8px}.vz-location-list-heading>span{font-size:11px;color:#64748b}.vz-location-missions{max-height:548px;overflow-y:auto;padding:8px}
-.vz-mission{display:block;width:100%;text-align:left;border:1px solid transparent;border-bottom-color:#edf2f7;background:#fff;border-radius:12px;padding:16px;cursor:pointer;color:#172554}.vz-mission:hover{background:#f8fafc}.vz-mission.is-selected{background:#eff6ff;border-color:#93c5fd}.vz-mission:focus-visible{outline:2px solid #2563eb;outline-offset:-2px}.vz-mission-top{display:flex;gap:8px;justify-content:space-between}.vz-mission-top strong{font-size:14px;font-weight:600}.vz-mission-top>span{font-size:11px;color:#64748b}.vz-mission-address,.vz-mission-meta{display:block;font-size:12px;margin-top:8px;overflow-wrap:anywhere}.vz-mission-meta{color:#64748b;font-size:11px}.vz-gps-state{display:inline-block;margin-top:12px;padding:4px 8px;background:#f1f5f9;border-radius:6px;color:#475569;font-size:10px}.vz-gps-state.is-fresh{background:#ecfeff;color:#0e7490}.vz-missing-location{display:block;font-size:11px;color:#9a3412;margin-top:8px}
-.vz-location-detail{display:flex;align-items:center;justify-content:space-between;gap:24px;background:#fff;border:1px solid #bfdbfe;border-radius:20px;margin-top:20px;padding:24px}.vz-location-detail[hidden]{display:none}.vz-location-detail h4{font-size:18px;margin:8px 0}.vz-location-detail small{color:#64748b;font-size:11px}.vz-location-actions{display:flex;flex-wrap:wrap;gap:8px}.vz-location-empty{padding:40px 20px;text-align:center;color:#64748b}.vz-location-empty i{font-size:28px;color:#2563eb}.vz-location-empty h4{font-size:16px;margin-top:16px}.vz-location-empty p{font-size:12px}
+.vz-map-legend{display:flex;flex-wrap:wrap;gap:12px;padding:16px 20px 8px;font-size: 13px;color:#475569}.vz-map-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}.vz-map-dot.destination{background:#2563eb}.vz-map-dot.driver{background:#0891b2}.vz-map-dot.stale{background:#64748b}
+.vz-location-notice{font-size: 14px;color:#64748b;padding:4px 20px 16px;margin:0;min-height:52px}
+.vz-location-list-heading{padding:20px;border-bottom:1px solid #e2e8f0}.vz-location-list-heading h4{font-size: 16px;margin:0 0 8px}.vz-location-list-heading>span{font-size: 13px;color:#64748b}.vz-location-missions{max-height:548px;overflow-y:auto;padding:8px}
+.vz-mission{display:block;width:100%;text-align:left;border:1px solid transparent;border-bottom-color:#edf2f7;background:#fff;border-radius:12px;padding:16px;cursor:pointer;color:#172554}.vz-mission:hover{background:#f8fafc}.vz-mission.is-selected{background:#eff6ff;border-color:#93c5fd}.vz-mission:focus-visible{outline:2px solid #2563eb;outline-offset:-2px}.vz-mission-top{display:flex;gap:8px;justify-content:space-between}.vz-mission-top strong{font-size: 14px;font-weight:600}.vz-mission-top>span{font-size: 13px;color:#64748b}.vz-mission-address,.vz-mission-meta{display:block;font-size: 14px;margin-top:8px;overflow-wrap:anywhere}.vz-mission-meta{color:#64748b;font-size: 13px}.vz-gps-state{display:inline-block;margin-top:12px;padding:4px 8px;background:#f1f5f9;border-radius:6px;color:#475569;font-size: 13px}.vz-gps-state.is-fresh{background:#ecfeff;color:#0e7490}.vz-missing-location{display:block;font-size: 13px;color:#9a3412;margin-top:8px}
+.vz-location-detail{display:flex;align-items:center;justify-content:space-between;gap:24px;background:#fff;border:1px solid #bfdbfe;border-radius:20px;margin-top:20px;padding:24px}.vz-location-detail[hidden]{display:none}.vz-location-detail h4{font-size: 18px;margin:8px 0}.vz-location-detail small{color:#64748b;font-size: 13px}.vz-location-actions{display:flex;flex-wrap:wrap;gap:8px}.vz-location-empty{padding:40px 20px;text-align:center;color:#64748b}.vz-location-empty i{font-size: 28px;color:#2563eb}.vz-location-empty h4{font-size: 16px;margin-top:16px}.vz-location-empty p{font-size: 14px}
 @media(max-width:1100px){.vz-location-workspace{grid-template-columns:minmax(0,1fr) 280px}.vz-location-stats>div{padding:0 12px}.vz-location-detail{flex-wrap:wrap}}
-@media(max-width:767px){.vz-location-heading{align-items:start}.vz-location-heading h3{font-size:24px}.vz-location-heading p{font-size:12px}.vz-location-heading .btn{font-size:0;min-width:44px}.vz-location-heading .btn i{font-size:16px}.vz-location-stats{padding:16px;gap:8px}.vz-location-stats>div{display:block;padding:0 8px}.vz-location-stats strong,.vz-location-stats span{display:block}.vz-location-stats strong{font-size:24px}.vz-location-stats span{font-size:10px;margin-top:4px}.vz-location-filters{flex-wrap:wrap}.vz-location-filters>div:first-child{flex:1 1 100%}.vz-location-filters>div:nth-child(2){flex:1 1 100%}.vz-location-filters>.btn{flex:1}.vz-location-workspace{grid-template-columns:minmax(0,1fr)}.vz-location-map{height:340px}.vz-location-missions{max-height:360px}.vz-location-detail{padding:20px;gap:16px}.vz-location-detail>div{width:100%}.vz-location-actions .btn{flex:1}.vz-map-placeholder{padding:32px 20px}}
+@media(max-width:767px){.vz-location-heading{align-items:start}.vz-location-heading h3{font-size: 24px}.vz-location-heading p{font-size: 14px}.vz-location-heading .btn{font-size:0;min-width:44px}.vz-location-heading .btn i{font-size: 16px}.vz-location-stats{padding:16px;gap:8px}.vz-location-stats>div{display:block;padding:0 8px}.vz-location-stats strong,.vz-location-stats span{display:block}.vz-location-stats strong{font-size: 24px}.vz-location-stats span{font-size: 13px;margin-top:4px}.vz-location-filters{flex-wrap:wrap}.vz-location-filters>div:first-child{flex:1 1 100%}.vz-location-filters>div:nth-child(2){flex:1 1 100%}.vz-location-filters>.btn{flex:1}.vz-location-workspace{grid-template-columns:minmax(0,1fr)}.vz-location-map{height:340px}.vz-location-missions{max-height:360px}.vz-location-detail{padding:20px;gap:16px}.vz-location-detail>div{width:100%}.vz-location-actions .btn{flex:1}.vz-map-placeholder{padding:32px 20px}}
+
+/* Readable admin typography, with room for labels at normal browser zoom. */
+body.vz-app { font-size: 15px; }
+.vz-nav-link, .vz-person strong, .vz-recent .table, .btn { font-size: 15px; }
+.vz-person small, .vz-subtle, .table thead th { font-size: 14px; }
+.vz-panel-heading h2, .vz-schedule h2 { font-size: 18px; }
+.vz-operation-actions .btn { min-height: 40px; font-size: 14px; }
+.vz-shortcut-grid a { padding: 14px 6px; overflow-wrap: anywhere; }
+.vz-shortcut-grid svg { width: 20px; height: 20px; }
+.vz-chart svg { max-height: none; }
+.vz-status, .vz-soft-tag { line-height: 1.5; }
+
+.vz-dashboard-title h1 { font-size: 26px; }
+.vz-chart-dates { display: flex; justify-content: space-between; gap: 4px; font-size: 13px; color: #475569; }
+@media (max-width: 1400px) { .vz-shortcut-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

@@ -31,10 +31,12 @@
                     @foreach([30, 70, 110, 155] as $y)<line x1="20" y1="{{ $y }}" x2="680" y2="{{ $y }}" stroke="#e2e8f0" stroke-dasharray="4 5"/>@endforeach
                     <polygon points="20,155 {{ $points }} 680,155" fill="url(#revenue-fill)"/>
                     <polyline points="{{ $points }}" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-                    @foreach($series as $index => $point)
-                        @if($days === 7 || $index % 5 === 0 || $loop->last)<text x="{{ 20 + $index * (660 / max(1, $series->count() - 1)) }}" y="180" text-anchor="middle" fill="#77736e" font-size="11">{{ $point['label'] }}</text>@endif
-                    @endforeach
                 </svg>
+                <div class="vz-chart-dates" aria-hidden="true">
+                    @foreach($series as $index => $point)
+                        @if($days === 7 || $index % 5 === 0 || $loop->last)<span>{{ $point['label'] }}</span>@endif
+                    @endforeach
+                </div>
                 <figcaption><span class="vz-dot primary"></span> Encaissements confirmés @if($series->sum('amount') === 0) · Aucun encaissement sur cette période @endif</figcaption>
             </figure>
             @if($estimatedRevenue)<p class="vz-subtle">Certains anciens abonnements utilisent un montant reconstitué à vérifier.</p>@endif
