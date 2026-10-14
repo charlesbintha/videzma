@@ -20,8 +20,10 @@ fournisseur adapté si le trafic augmente. `MAP_TILE_URL` est configurable au bu
 La configuration reste sur `google` tant que la clé openrouteservice n'est pas
 fournie et que le basculement n'a pas été validé. Aucun repli automatique vers
 Google payant ni vers un serveur public de démonstration OSRM n'est effectué.
-L'activation en production reste à faire : ne pas annoncer les trajets opérationnels
-avant un vrai test avec la clé. Les tests automatisés utilisent des réponses simulées.
+Activation effectuée sur videzma.emmaluxury.store le 14 octobre 2026. Un trajet public
+à Dakar a été vérifié depuis la production : 4,12 km, 7 minutes estimées, 13 instructions.
+Les tests automatisés utilisent des réponses simulées ; le suivi en déplacement réel
+sur téléphone reste à vérifier.
 
 ## Gratuité et limites
 
