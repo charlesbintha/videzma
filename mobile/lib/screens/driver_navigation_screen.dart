@@ -560,6 +560,8 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
               right: 12,
               child: SafeArea(
                 child: FloatingActionButton.small(
+                  backgroundColor: AppColors.secondary,
+                  foregroundColor: Colors.white,
                   heroTag: 'show-navigation-panels',
                   tooltip: 'Afficher les informations du trajet',
                   onPressed: () => setState(() => _panelsVisible = true),
@@ -641,6 +643,8 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
               child: Column(
                 children: [
                   FloatingActionButton.small(
+                    backgroundColor: AppColors.secondary,
+                    foregroundColor: Colors.white,
                     heroTag: 'center',
                     tooltip: 'Recentrer sur ma position',
                     onPressed: () {
@@ -655,6 +659,8 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
                   ),
                   const SizedBox(height: 8),
                   FloatingActionButton.small(
+                    backgroundColor: AppColors.secondary,
+                    foregroundColor: Colors.white,
                     heroTag: 'refresh',
                     tooltip: 'Recalculer le trajet',
                     onPressed: _refreshRoute,
