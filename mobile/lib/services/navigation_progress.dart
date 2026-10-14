@@ -96,18 +96,22 @@ class NavigationProgress {
     final points = <LatLng>[];
     var index = 0, latitude = 0, longitude = 0;
     int component() {
-      var result = 0, shift = 0;
+      var result = 0, multiplier = 1;
       while (true) {
-        if (index >= encoded.length || shift > 30) {
+        if (index >= encoded.length || multiplier > 1073741824) {
           throw const FormatException('Invalid polyline');
         }
         final value = encoded.codeUnitAt(index++) - 63;
         if (value < 0 || value > 63) {
           throw const FormatException('Invalid polyline');
         }
-        result |= (value & 31) << shift;
-        shift += 5;
-        if (value < 32) return (result & 1) != 0 ? ~(result >> 1) : result >> 1;
+        // Arithmetic keeps negative deltas identical on Dart VM and JavaScript.
+        result += (value % 32) * multiplier;
+        multiplier *= 32;
+        if (value < 32) {
+          final magnitude = result ~/ 2;
+          return result.isOdd ? -magnitude - 1 : magnitude;
+        }
       }
     }
 
@@ -115,6 +119,9 @@ class NavigationProgress {
       while (index < encoded.length) {
         latitude += component();
         longitude += component();
+        if (latitude.abs() > 9000000 || longitude.abs() > 18000000) {
+          throw const FormatException('Polyline coordinates out of range');
+        }
         points
             .add(LatLng(latitude: latitude / 1e5, longitude: longitude / 1e5));
       }

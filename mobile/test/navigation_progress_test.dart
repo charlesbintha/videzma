@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:videzma_mobile/models/navigation_route.dart';
 import 'package:videzma_mobile/services/navigation_progress.dart';
 
+import 'fixtures/dakar_polyline.dart';
+
 LatLng point(double lat, double lng) => LatLng(latitude: lat, longitude: lng);
 NavigationRoute route() => NavigationRoute(
       sessionId: 8,
@@ -67,6 +69,17 @@ void main() {
     expect(points.first.latitude, 38.5);
     expect(points.last.longitude, -126.453);
     expect(NavigationProgress.decodePolyline('_p~iF~ps|U_'), isEmpty);
+  });
+  test('Production Dakar geometry stays on valid geographic coordinates', () {
+    final points = NavigationProgress.decodePolyline(dakarPolyline);
+    expect(points.length, greaterThan(80));
+    for (final point in points) {
+      expect(point.latitude, inInclusiveRange(14.68, 14.73));
+      expect(point.longitude, inInclusiveRange(-17.49, -17.43));
+    }
+  });
+  test('Out of range coordinates are rejected before rendering', () {
+    expect(NavigationProgress.decodePolyline('_gjaR?'), isEmpty);
   });
   test('Missing geometry does not invent navigation progress', () {
     final tracker = NavigationProgress(
