@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../widgets/app_map.dart';
+import '../widgets/navigation_panel.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:url_launcher/url_launcher.dart';
 import '../models/navigation_route.dart' as nav;
@@ -10,6 +11,7 @@ import '../theme/app_colors.dart';
 
 /// Navigation screen for drivers to navigate to client location
 class DriverNavigationScreen extends StatefulWidget {
+  final NavigationService? navigationService;
   final int serviceRequestId;
   final int clientId;
   final String clientName;
@@ -20,6 +22,7 @@ class DriverNavigationScreen extends StatefulWidget {
 
   const DriverNavigationScreen({
     super.key,
+    this.navigationService,
     required this.serviceRequestId,
     required this.clientId,
     required this.clientName,
@@ -35,7 +38,7 @@ class DriverNavigationScreen extends StatefulWidget {
 
 class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
   AppMapController? _mapController;
-  final NavigationService _navigationService = NavigationService();
+  late final NavigationService _navigationService;
   StreamSubscription<geo.Position>? _positionSubscription;
 
   nav.NavigationRoute? _currentRoute;
@@ -49,6 +52,7 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
   geo.Position? _latestPosition, _pendingUpload;
   bool _uploading = false, _refreshing = false, _arrivalShown = false;
   bool _followDriver = true, _stopping = false;
+  bool _panelsVisible = true;
   String? _gpsStatus, _networkStatus;
   DateTime? _lastRefresh, _lastCamera, _lastUpload;
   nav.LatLng? _refreshOrigin;
@@ -62,6 +66,7 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
   @override
   void initState() {
     super.initState();
+    _navigationService = widget.navigationService ?? NavigationService();
     _startNavigation();
   }
 
@@ -420,7 +425,7 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
         children: [
           // Map
           Listener(
-            onPointerDown: (_) => _followDriver = false,
+            onPointerMove: (_) => _followDriver = false,
             child: AppMap(
               initialCameraPosition: MapCameraPosition(
                 target: _driverPosition ?? clientPosition,
@@ -431,6 +436,11 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
               onMapCreated: (controller) {
                 _mapController = controller;
               },
+              onTap: (_) {
+                if (!_isLoading && _errorMessage == null) {
+                  setState(() => _panelsVisible = !_panelsVisible);
+                }
+              },
               zoomControlsEnabled: false,
             ),
           ),
@@ -440,98 +450,123 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
             top: 0,
             left: 0,
             right: 0,
-            child: SafeArea(
-              child: Container(
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    // Header with back button
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () => _confirmStopNavigation(),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  widget.clientName,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                if (widget.clientAddress != null)
+            child: NavigationPanel(
+              visible: _panelsVisible,
+              fromTop: true,
+              child: SafeArea(
+                bottom: false,
+                child: Container(
+                  margin: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      // Header with back button
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              tooltip: 'Quitter la navigation',
+                              icon: const Icon(Icons.close),
+                              onPressed: () => _confirmStopNavigation(),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                   Text(
-                                    widget.clientAddress!,
-                                    style: TextStyle(
-                                      color: AppColors.textMuted,
-                                      fontSize: 12,
-                                    ),
+                                    widget.clientName,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
-                              ],
+                                  if (widget.clientAddress != null)
+                                    Text(
+                                      widget.clientAddress!,
+                                      style: TextStyle(
+                                        color: AppColors.textMuted,
+                                        fontSize: 12,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.phone,
-                                color: AppColors.secondary),
-                            onPressed: _callClient,
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.map_outlined),
-                            onPressed: _openInExternalMaps,
-                          ),
-                        ],
+                            IconButton(
+                              tooltip: 'Appeler le client',
+                              icon: const Icon(Icons.phone,
+                                  color: AppColors.secondary),
+                              onPressed: _callClient,
+                            ),
+                            IconButton(
+                              tooltip: 'Ouvrir dans Google Maps',
+                              icon: const Icon(Icons.map_outlined),
+                              onPressed: _openInExternalMaps,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    if (_gpsStatus != null ||
-                        _networkStatus != null ||
-                        _refreshing)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                        child: Text(
-                            _gpsStatus ??
-                                (_refreshing
-                                    ? 'Recalcul du trajet…'
-                                    : _networkStatus!),
-                            style: const TextStyle(
-                                fontSize: 14, color: AppColors.textMuted)),
-                      ),
-                    if (_currentRoute?.routeData?.provider ==
-                        'openrouteservice')
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
-                        child: Text(
-                            'Itinéraire : © openrouteservice.org by HeiGIT',
-                            style: TextStyle(
-                                fontSize: 11, color: AppColors.textMuted)),
-                      ),
-                    // Current step instruction
-                    if (_currentRoute?.routeData?.legs.isNotEmpty == true)
-                      _buildCurrentInstruction(),
-                  ],
+                      if (_gpsStatus != null ||
+                          _networkStatus != null ||
+                          _refreshing)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                          child: Text(
+                              _gpsStatus ??
+                                  (_refreshing
+                                      ? 'Recalcul du trajet…'
+                                      : _networkStatus!),
+                              style: const TextStyle(
+                                  fontSize: 14, color: AppColors.textMuted)),
+                        ),
+                      if (_currentRoute?.routeData?.provider ==
+                          'openrouteservice')
+                        const Padding(
+                          padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+                          child: Text(
+                              'Itinéraire : © openrouteservice.org by HeiGIT',
+                              style: TextStyle(
+                                  fontSize: 11, color: AppColors.textMuted)),
+                        ),
+                      // Current step instruction
+                      if (_currentRoute?.routeData?.legs.isNotEmpty == true)
+                        _buildCurrentInstruction(),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
+
+          // Accessible alternative to tapping the map to restore the panels.
+          if (!_panelsVisible)
+            Positioned(
+              top: 12,
+              right: 12,
+              child: SafeArea(
+                child: FloatingActionButton.small(
+                  heroTag: 'show-navigation-panels',
+                  tooltip: 'Afficher les informations du trajet',
+                  onPressed: () => setState(() => _panelsVisible = true),
+                  child: const Icon(Icons.unfold_more),
+                ),
+              ),
+            ),
 
           // Loading overlay
           if (_isLoading)
@@ -585,21 +620,29 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
               left: 0,
               right: 0,
               bottom: 0,
-              child: SafeArea(
-                top: false,
-                child: _buildBottomPanel(),
+              child: NavigationPanel(
+                visible: _panelsVisible,
+                fromTop: false,
+                child: SafeArea(
+                  top: false,
+                  child: _buildBottomPanel(),
+                ),
               ),
             ),
 
           // Floating buttons
           if (_isNavigating)
-            Positioned(
-              right: 16,
-              bottom: 200,
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 240),
+              curve: Curves.easeInOutCubic,
+              right: 12,
+              bottom: MediaQuery.paddingOf(context).bottom +
+                  (_panelsVisible ? 184 : 16),
               child: Column(
                 children: [
                   FloatingActionButton.small(
                     heroTag: 'center',
+                    tooltip: 'Recentrer sur ma position',
                     onPressed: () {
                       _followDriver = true;
                       if (_driverPosition != null) {
@@ -613,6 +656,7 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
                   const SizedBox(height: 8),
                   FloatingActionButton.small(
                     heroTag: 'refresh',
+                    tooltip: 'Recalculer le trajet',
                     onPressed: _refreshRoute,
                     child: const Icon(Icons.refresh),
                   ),
@@ -636,14 +680,14 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
     final step = steps[_currentStepIndex];
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: const BoxDecoration(
         border: Border(top: BorderSide(color: AppColors.border)),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: AppColors.primary100,
               borderRadius: BorderRadius.circular(12),
@@ -684,8 +728,8 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
 
   Widget _buildBottomPanel() {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -708,12 +752,12 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
                   iconColor: AppColors.primary,
                   value: _formatEta(
                       _remainingEta ?? _currentRoute?.etaMinutes ?? 0),
-                  label: 'Arrivee estimee',
+                  label: 'Temps restant',
                 ),
               ),
               Container(
                 width: 1,
-                height: 50,
+                height: 36,
                 color: AppColors.border,
               ),
               Expanded(
@@ -728,16 +772,16 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
 
           // Arrived button
           SizedBox(
             width: double.infinity,
-            height: 52,
+            height: 48,
             child: ElevatedButton.icon(
               onPressed: _showArrivedDialog,
               icon: const Icon(Icons.check_circle_outline),
-              label: const Text('Je suis arrive'),
+              label: const Text('Je suis arrivé'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.secondary,
                 foregroundColor: Colors.white,
@@ -758,23 +802,23 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
     required String value,
     required String label,
   }) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, color: iconColor, size: 24),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: AppColors.textMuted,
-            fontSize: 12,
+        Icon(icon, color: iconColor, size: 20),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(value,
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold)),
+              Text(label,
+                  style: const TextStyle(
+                      color: AppColors.textMuted, fontSize: 12)),
+            ],
           ),
         ),
       ],
