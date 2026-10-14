@@ -421,13 +421,23 @@ class _MenuSection extends StatelessWidget {
           const Divider(height: 1, indent: 56),
           _MenuItem(
             icon: Icons.info_outline,
-            label: "A propos",
+            label: "À propos et licences",
             onTap: () {
               showAboutDialog(
                 context: context,
                 applicationName: 'Videzma',
-                applicationVersion: '0.1.0',
-                applicationLegalese: '2025 Videzma. Tous droits reserves.',
+                applicationVersion: '0.1.6',
+                applicationLegalese: '2026 Videzma. Tous droits réservés.',
+                children: [
+                  const SizedBox(height: 16),
+                  const Text(
+                      'Données cartographiques : © OpenStreetMap contributors. Licence ODbL.'),
+                  TextButton(
+                    onPressed: () => launchUrl(
+                        Uri.parse('https://www.openstreetmap.org/copyright')),
+                    child: const Text('Crédits et licence OpenStreetMap'),
+                  ),
+                ],
               );
             },
           ),

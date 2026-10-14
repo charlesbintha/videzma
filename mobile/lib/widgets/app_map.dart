@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as fm;
 import 'package:latlong2/latlong.dart';
-import 'map_attribution.dart';
 export 'package:latlong2/latlong.dart' show LatLng;
 
 class MapCameraPosition {
@@ -158,11 +157,6 @@ class _AppMapState extends State<AppMap> {
                       ))
                   .toList()),
         ],
-      ),
-      // Stay clear of the floating mission panels at the top and bottom.
-      const Align(
-        alignment: Alignment.centerLeft,
-        child: MapAttribution(),
       ),
       if (widget.zoomControlsEnabled)
         Positioned(
