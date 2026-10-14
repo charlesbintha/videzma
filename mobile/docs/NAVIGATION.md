@@ -1,4 +1,6 @@
-# Navigation chauffeur Google Maps
+# Navigation chauffeur
+
+> Version 0.1.2 : voir [OPEN_SOURCE_MAPS.md](OPEN_SOURCE_MAPS.md) pour la migration OpenStreetMap/openrouteservice. Les détails ci-dessous décrivent la version Google 0.1.1.
 
 La version 0.1.1 utilise la carte Google existante et les itinéraires calculés par
 Laravel via Google Directions. Il s'agit d'un guidage visuel dans Videzma, sans

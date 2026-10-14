@@ -7,12 +7,12 @@ use App\Models\Location;
 use App\Models\NavigationSession;
 use App\Models\ServiceRequest;
 use App\Models\User;
-use App\Services\Maps\GoogleMapsDirections;
+use App\Services\Maps\DirectionsService;
 use Illuminate\Http\Request;
 
 class RouteController extends Controller
 {
-    public function fastest(Request $request, User $client, GoogleMapsDirections $maps)
+    public function fastest(Request $request, User $client, DirectionsService $maps)
     {
         $driver = $request->user();
 

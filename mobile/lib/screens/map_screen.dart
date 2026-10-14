@@ -2,7 +2,7 @@ import "package:pointer_interceptor/pointer_interceptor.dart";
 import "package:flutter/foundation.dart";
 import "dart:async";
 import "package:flutter/material.dart";
-import "package:google_maps_flutter/google_maps_flutter.dart";
+import '../widgets/app_map.dart';
 import "package:geolocator/geolocator.dart";
 import "../theme/app_colors.dart";
 import "../services/location_store.dart";
@@ -17,7 +17,7 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  GoogleMapController? controller;
+  AppMapController? controller;
   StreamSubscription<Position>? subscription;
   bool tracking = false;
   bool isUpdating = false;
@@ -74,7 +74,7 @@ class _MapScreenState extends State<MapScreen> {
       final first = lastSentAt == null;
       LocationStore.set(position.latitude, position.longitude);
       if (first)
-        controller?.animateCamera(CameraUpdate.newLatLngZoom(
+        controller?.animateCamera(MapCameraUpdate.newLatLngZoom(
             LatLng(position.latitude, position.longitude), 15));
       setState(() {});
       if (sending ||
@@ -117,7 +117,7 @@ class _MapScreenState extends State<MapScreen> {
           : locationService.lastError ?? 'Position indisponible.';
     });
     if (sent && LocationStore.hasLocation) {
-      controller?.animateCamera(CameraUpdate.newLatLngZoom(
+      controller?.animateCamera(MapCameraUpdate.newLatLngZoom(
           LatLng(LocationStore.latitude!, LocationStore.longitude!), 15));
     }
   }
@@ -133,23 +133,21 @@ class _MapScreenState extends State<MapScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            GoogleMap(
-              initialCameraPosition: CameraPosition(
+            AppMap(
+              initialCameraPosition: MapCameraPosition(
                 target: position,
                 zoom: 14,
               ),
               markers: {
                 if (LocationStore.latitude != null &&
                     LocationStore.longitude != null)
-                  Marker(
-                    markerId: const MarkerId("client"),
+                  MapMarker(
+                    id: "client",
                     position: position,
                   ),
               },
               onMapCreated: (map) => controller = map,
-              myLocationEnabled: false,
               zoomControlsEnabled: false,
-              mapToolbarEnabled: false,
             ),
             Positioned(
               left: 16,
@@ -199,7 +197,7 @@ class _MapScreenState extends State<MapScreen> {
                           icon: const Icon(Icons.my_location),
                           onPressed: () {
                             controller?.animateCamera(
-                              CameraUpdate.newLatLngZoom(position, 15),
+                              MapCameraUpdate.newLatLngZoom(position, 15),
                             );
                           },
                         ),

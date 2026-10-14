@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../widgets/app_map.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/driver_position.dart';
 import '../services/driver_tracking_service.dart';
@@ -29,7 +29,7 @@ class DriverTrackingScreen extends StatefulWidget {
 
 class _DriverTrackingScreenState extends State<DriverTrackingScreen>
     with TickerProviderStateMixin {
-  GoogleMapController? _mapController;
+  AppMapController? _mapController;
 
   // Dual tracking: WebSocket (primary) + Polling (fallback)
   final RealtimeTrackingService _realtimeService =
@@ -223,21 +223,13 @@ class _DriverTrackingScreenState extends State<DriverTrackingScreen>
     _markerAnimationController!.forward();
   }
 
-  void _centerOnDriver() {
-    if (_animatedDriverPosition != null && _mapController != null) {
-      _mapController!.animateCamera(
-        CameraUpdate.newLatLngZoom(_animatedDriverPosition!, 15),
-      );
-    }
-  }
-
   void _fitBothMarkers() {
     if (_animatedDriverPosition == null || _mapController == null) return;
 
     final clientPos = LatLng(widget.clientLatitude, widget.clientLongitude);
     final driverPos = _animatedDriverPosition!;
 
-    final bounds = LatLngBounds(
+    final bounds = MapBounds(
       southwest: LatLng(
         driverPos.latitude < clientPos.latitude
             ? driverPos.latitude
@@ -257,7 +249,7 @@ class _DriverTrackingScreenState extends State<DriverTrackingScreen>
     );
 
     _mapController!.animateCamera(
-      CameraUpdate.newLatLngBounds(bounds, 80),
+      MapCameraUpdate.newLatLngBounds(bounds, 80),
     );
   }
 
@@ -282,31 +274,26 @@ class _DriverTrackingScreenState extends State<DriverTrackingScreen>
         LatLng(widget.clientLatitude, widget.clientLongitude);
 
     // Build markers
-    final markers = <Marker>{
+    final markers = <MapMarker>{
       // Client destination marker
-      Marker(
-        markerId: const MarkerId('client'),
+      MapMarker(
+        id: 'client',
         position: clientPosition,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        infoWindow: InfoWindow(
-          title: 'Destination',
-          snippet: widget.clientAddress ?? 'Votre position',
-        ),
+        color: Colors.green,
+        title: 'Destination',
+        snippet: widget.clientAddress ?? 'Votre position',
       ),
     };
 
     // Add driver marker if we have a position
     if (_animatedDriverPosition != null) {
       markers.add(
-        Marker(
-          markerId: const MarkerId('driver'),
+        MapMarker(
+          id: 'driver',
           position: _animatedDriverPosition!,
-          icon:
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
-          infoWindow: InfoWindow(
-            title: _currentPosition?.driverName ?? 'Vidangeur',
-            snippet: _currentPosition?.formattedEta ?? '',
-          ),
+          color: Colors.orange,
+          title: _currentPosition?.driverName ?? 'Vidangeur',
+          snippet: _currentPosition?.formattedEta ?? '',
         ),
       );
     }
@@ -315,8 +302,8 @@ class _DriverTrackingScreenState extends State<DriverTrackingScreen>
       body: Stack(
         children: [
           // Map
-          GoogleMap(
-            initialCameraPosition: CameraPosition(
+          AppMap(
+            initialCameraPosition: MapCameraPosition(
               target: clientPosition,
               zoom: 14,
             ),
@@ -325,14 +312,12 @@ class _DriverTrackingScreenState extends State<DriverTrackingScreen>
               _mapController = controller;
               // Fit both markers after a short delay
               Future.delayed(const Duration(milliseconds: 500), () {
-                if (_animatedDriverPosition != null) {
+                if (mounted && _animatedDriverPosition != null) {
                   _fitBothMarkers();
                 }
               });
             },
-            myLocationEnabled: false,
             zoomControlsEnabled: false,
-            mapToolbarEnabled: false,
           ),
 
           // Top bar

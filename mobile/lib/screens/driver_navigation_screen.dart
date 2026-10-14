@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../widgets/app_map.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:url_launcher/url_launcher.dart';
 import '../models/navigation_route.dart' as nav;
@@ -34,7 +34,7 @@ class DriverNavigationScreen extends StatefulWidget {
 }
 
 class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
-  GoogleMapController? _mapController;
+  AppMapController? _mapController;
   final NavigationService _navigationService = NavigationService();
   StreamSubscription<geo.Position>? _positionSubscription;
 
@@ -175,7 +175,7 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
             now.difference(_lastCamera!).inMilliseconds >= 1500)) {
       _lastCamera = now;
       _mapController
-          ?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+          ?.animateCamera(MapCameraUpdate.newCameraPosition(MapCameraPosition(
         target: _driverPosition!,
         zoom: 17,
         bearing: position.speed > 1 &&
@@ -198,8 +198,8 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
         _lastRefresh == null ? 999 : now.difference(_lastRefresh!).inSeconds;
     final moved = NavigationProgress.distance(_refreshOrigin!, fix);
     if (!_refreshing &&
-        elapsed >= 20 &&
-        (_offRouteFixes >= 2 || (elapsed >= 60 && moved >= 50))) {
+        elapsed >= 30 &&
+        (_offRouteFixes >= 2 || (elapsed >= 300 && moved >= 50))) {
       unawaited(_refreshRoute());
     }
     final destination = nav.LatLng(
@@ -377,40 +377,37 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
         LatLng(widget.clientLatitude, widget.clientLongitude);
 
     // Build markers
-    final markers = <Marker>{
+    final markers = <MapMarker>{
       // Client destination marker
-      Marker(
-        markerId: const MarkerId('client'),
+      MapMarker(
+        id: 'client',
         position: clientPosition,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        infoWindow: InfoWindow(
-          title: widget.clientName,
-          snippet: widget.clientAddress,
-        ),
+        color: Colors.green,
+        title: widget.clientName,
+        snippet: widget.clientAddress,
       ),
     };
 
     // Add driver marker if we have position
     if (_driverPosition != null) {
       markers.add(
-        Marker(
-          markerId: const MarkerId('driver'),
-          position: _driverPosition!,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          infoWindow: const InfoWindow(title: 'Ma position'),
-        ),
+        MapMarker(
+            id: 'driver',
+            position: _driverPosition!,
+            color: Colors.blue,
+            title: 'Ma position'),
       );
     }
 
     // Build polyline from route
-    final polylines = <Polyline>{};
+    final polylines = <MapLine>{};
     if (_currentRoute?.polyline != null) {
       final points = (_progress?.points ?? <nav.LatLng>[])
           .map((p) => LatLng(p.latitude, p.longitude))
           .toList();
       polylines.add(
-        Polyline(
-          polylineId: const PolylineId('route'),
+        MapLine(
+          id: 'route',
           points: points,
           color: AppColors.primary,
           width: 5,
@@ -424,8 +421,8 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
           // Map
           Listener(
             onPointerDown: (_) => _followDriver = false,
-            child: GoogleMap(
-              initialCameraPosition: CameraPosition(
+            child: AppMap(
+              initialCameraPosition: MapCameraPosition(
                 target: _driverPosition ?? clientPosition,
                 zoom: 14,
               ),
@@ -434,10 +431,7 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
               onMapCreated: (controller) {
                 _mapController = controller;
               },
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
               zoomControlsEnabled: false,
-              mapToolbarEnabled: false,
             ),
           ),
 
@@ -521,6 +515,15 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
                             style: const TextStyle(
                                 fontSize: 14, color: AppColors.textMuted)),
                       ),
+                    if (_currentRoute?.routeData?.provider ==
+                        'openrouteservice')
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+                        child: Text(
+                            'Itinéraire : © openrouteservice.org by HeiGIT',
+                            style: TextStyle(
+                                fontSize: 11, color: AppColors.textMuted)),
+                      ),
                     // Current step instruction
                     if (_currentRoute?.routeData?.legs.isNotEmpty == true)
                       _buildCurrentInstruction(),
@@ -601,7 +604,7 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
                       _followDriver = true;
                       if (_driverPosition != null) {
                         _mapController?.animateCamera(
-                          CameraUpdate.newLatLngZoom(_driverPosition!, 16),
+                          MapCameraUpdate.newLatLngZoom(_driverPosition!, 16),
                         );
                       }
                     },

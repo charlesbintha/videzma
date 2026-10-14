@@ -122,10 +122,12 @@ class LatLng {
 class RouteData {
   final List<RouteLeg> legs;
   final String? overviewPolyline;
+  final String? provider;
 
   RouteData({
     required this.legs,
     this.overviewPolyline,
+    this.provider,
   });
 
   factory RouteData.fromJson(Map<String, dynamic> json) {
@@ -139,6 +141,7 @@ class RouteData {
     final polyline = firstRoute['overview_polyline'] as Map<String, dynamic>?;
 
     return RouteData(
+      provider: json['provider'] as String?,
       legs: legsJson
           .map((e) => RouteLeg.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -220,6 +223,11 @@ class RouteStep {
   static String _stripHtml(String htmlString) {
     return htmlString
         .replaceAll(RegExp(r'<[^>]*>'), ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&#039;', "'")
+        .replaceAll('&quot;', '"')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
         .replaceAll(RegExp(r'\s+'), ' ')
         .trim();
   }

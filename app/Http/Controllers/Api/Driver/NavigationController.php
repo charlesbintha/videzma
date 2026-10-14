@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Api\Driver;
 use App\Http\Controllers\Controller;
 use App\Models\Location;
 use App\Models\ServiceRequest;
-use App\Services\Maps\GoogleMapsDirections;
+use App\Services\Maps\DirectionsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class NavigationController extends Controller
 {
     public function __construct(
-        protected GoogleMapsDirections $mapsService
+        protected DirectionsService $mapsService
     ) {}
 
     /**

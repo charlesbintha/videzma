@@ -34,15 +34,21 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'routing' => [
+        'provider' => env('ROUTING_PROVIDER', 'google'),
+    ],
+    'openrouteservice' => [
+        'key' => env('OPENROUTESERVICE_API_KEY'),
+    ],
     'google_maps' => [
         'key' => env('GOOGLE_MAPS_API_KEY'),
         'map_id' => env('GOOGLE_MAPS_MAP_ID'),
     ],
 
     'paytech' => [
-        'api_key'    => env('PAYTECH_API_KEY', ''),
+        'api_key' => env('PAYTECH_API_KEY', ''),
         'api_secret' => env('PAYTECH_API_SECRET', ''),
-        'env'        => env('PAYTECH_ENV', 'test'),
+        'env' => env('PAYTECH_ENV', 'test'),
     ],
 
 ];

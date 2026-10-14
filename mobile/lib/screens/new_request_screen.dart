@@ -1,6 +1,6 @@
 import '../services/location_service.dart';
 import "package:flutter/material.dart";
-import "package:google_maps_flutter/google_maps_flutter.dart";
+import '../widgets/app_map.dart';
 import "../theme/app_colors.dart";
 import "../widgets/primary_button.dart";
 import "../services/service_request_service.dart";
@@ -398,9 +398,9 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                             clipBehavior: Clip.antiAlias,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(22)),
-                            child: GoogleMap(
+                            child: AppMap(
                               key: ValueKey(locating),
-                              initialCameraPosition: CameraPosition(
+                              initialCameraPosition: MapCameraPosition(
                                   target:
                                       site ?? const LatLng(14.6937, -17.4441),
                                   zoom: 13),
@@ -411,16 +411,12 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                               }),
                               markers: {
                                 if (site != null)
-                                  Marker(
-                                      markerId: const MarkerId('intervention'),
+                                  MapMarker(
+                                      id: 'intervention',
                                       position: site!,
-                                      icon:
-                                          BitmapDescriptor.defaultMarkerWithHue(
-                                              BitmapDescriptor.hueAzure))
+                                      color: Colors.blue)
                               },
                               zoomControlsEnabled: true,
-                              mapToolbarEnabled: false,
-                              myLocationButtonEnabled: false,
                             )),
                         const SizedBox(height: 12),
                         Row(
