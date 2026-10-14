@@ -1,6 +1,6 @@
 class NavigationRoute {
   final int sessionId;
-  final int? service_requestId;
+  final int? serviceRequestId;
   final double distanceMeters;
   final int etaMinutes;
   final String? formattedDistanceText;
@@ -11,7 +11,7 @@ class NavigationRoute {
 
   NavigationRoute({
     required this.sessionId,
-    this.service_requestId,
+    this.serviceRequestId,
     required this.distanceMeters,
     required this.etaMinutes,
     this.formattedDistanceText,
@@ -24,7 +24,7 @@ class NavigationRoute {
   factory NavigationRoute.fromJson(Map<String, dynamic> json) {
     return NavigationRoute(
       sessionId: json['session_id'] as int? ?? 0,
-      service_requestId: json['service_request_id'] as int?,
+      serviceRequestId: json['service_request_id'] as int?,
       distanceMeters: (json['distance_meters'] as num?)?.toDouble() ?? 0,
       etaMinutes: json['eta_minutes'] as int? ?? 0,
       formattedDistanceText: json['formatted_distance'] as String?,
@@ -187,6 +187,7 @@ class RouteStep {
   final LatLng startLocation;
   final LatLng endLocation;
   final String? maneuver;
+  final String? polyline;
 
   RouteStep({
     required this.instruction,
@@ -195,6 +196,7 @@ class RouteStep {
     required this.startLocation,
     required this.endLocation,
     this.maneuver,
+    this.polyline,
   });
 
   factory RouteStep.fromJson(Map<String, dynamic> json) {
@@ -211,6 +213,7 @@ class RouteStep {
         longitude: (json['end_location']?['lng'] as num?)?.toDouble() ?? 0,
       ),
       maneuver: json['maneuver'] as String?,
+      polyline: json['polyline']?['points'] as String?,
     );
   }
 
