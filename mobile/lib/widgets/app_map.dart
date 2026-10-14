@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as fm;
 import 'package:latlong2/latlong.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'map_attribution.dart';
 export 'package:latlong2/latlong.dart' show LatLng;
 
 class MapCameraPosition {
@@ -159,20 +159,11 @@ class _AppMapState extends State<AppMap> {
                   .toList()),
         ],
       ),
-      // Kept at the side so floating top/bottom mission panels do not hide credit.
-      Align(
-          alignment: Alignment.centerLeft,
-          child: Material(
-            color: Colors.white.withValues(alpha: .9),
-            child: InkWell(
-              onTap: () => launchUrl(
-                  Uri.parse('https://www.openstreetmap.org/copyright')),
-              child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-                  child: Text('© OpenStreetMap contributors',
-                      style: TextStyle(fontSize: 11, color: Colors.black87))),
-            ),
-          )),
+      // Stay clear of the floating mission panels at the top and bottom.
+      const Align(
+        alignment: Alignment.centerLeft,
+        child: MapAttribution(),
+      ),
       if (widget.zoomControlsEnabled)
         Positioned(
             right: 8,
